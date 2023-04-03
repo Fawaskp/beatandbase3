@@ -1,0 +1,186 @@
+{% extends 'admin_home/base.html' %}
+
+{% block title %}
+Brand Management
+{% endblock title %}
+
+{% block searchbar %}
+<form class="search-form d-flex align-items-center" method="POST" action="{% url 'search-brands' %}">
+  {% csrf_token %}
+  <input type="text" value="{{search_text}}" name="query" placeholder="Search Brands" title="Enter search keyword">
+  <button type="submit" title="Search Brands"><i class="bi bi-search"></i></button>
+  {% if search_text %}
+  <a class="mx-5" href="{% url 'admin_brand' %}">
+    <button class=" bg-danger text-light p-1 px-2 rounded" type="button" title="Clear">clear</button>
+    </a>
+    {% endif %}
+</form>
+{% endblock searchbar %}
+
+
+{% block body %}
+{% for m in messages  %}
+<div class="alert alert-info" role="alert">
+  {{m}}
+</div>
+{% endfor %}
+<div class="pagetitle">
+  <h1>Brands</h1>
+</div><!-- End Page Title -->
+
+<section class="section dashboard">
+  <div class="row">
+
+    <!-- Left side columns -->
+    <div class="col-lg-12">
+      <div class="row">
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+          <div class="card recent-sales overflow-auto">
+
+            <div class="card-body">
+
+              <table class="table table-borderless datatable">
+                <thead>
+                  <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">image</th>
+                    <th scope="col">Name</th>
+                    <th colspan="2" scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody> 
+                  {% for b in brands  %}
+                  <tr>
+                    <th class="d-flex align-items-center" scope="row">{{b.id}}</th>
+                    <td>
+                      <div style="width: 100px;" class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                        {% if b.brand_img %}
+                        <img title="{{b.brand_img}}" class="img-fluid w-100" src="{{b.brand_img.url}}" alt="">
+                        {% else %}
+                        No image found
+                        {% endif %}
+                      </div>
+                    </td>
+                    <td>{{b.brand_name}}</td>
+                    <td>
+                      <!-- Button trigger modal -->
+                      <a type="button" class="fs-4 text-warning" data-bs-toggle="modal" data-bs-target="#confirmEdit{{forloop.counter}}">
+                        <i class="fa fa-edit"></i>
+                      </a>
+
+                      <!--Edit Modal -->
+                      <div class="modal fade" id="confirmEdit{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+
+                            <div class="modal-header">
+                              <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Product</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <div class="modal-body">
+                              <form action="{% url 'edit_brand' b.id %}" enctype="multipart/form-data" method="POST">
+                                {% csrf_token %}
+
+                                <div style="width: 100px;" class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                  <img class="img-fluid w-100" src="{{b.brand_img.url}}" alt="">
+                                </div> 
+
+                                <div class="form-outline mb-4">
+                                  <input name="image" type="file" accept="image/png, image/jpeg, image/svg" class="form-control"/>
+                                </div>
+                
+                                <div class="form-outline mb-4">
+                                  <input required minlength="3" name='brand_name' value="{{b.brand_name}}"  type="text" id="form3Example3cg" class="form-control form-control-lg" />
+                                  <label class="form-label" for="form3Example3cg">Brand name</label>
+                                </div>
+                
+                                <div class="d-flex justify-content-center">
+                                  <button type="submit"
+                                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                                </div>
+                
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                        <!-- Button trigger modal -->
+                        <a type="button" class="fs-4 text-danger" data-bs-toggle="modal" data-bs-target="#confirmDelete{{forloop.counter}}">
+                          <i class="fa fa-trash"></i>
+                        </a>
+  
+                        <!-- Modal -->
+                        <div class="modal fade" id="confirmDelete{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h2 class="modal-title fs-5" id="exampleModalLabel">Confirm Delete</h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <h5>
+                                  delete product <span class="text-danger">'{{b.brand_name}}'</span>
+                                </h5>
+                              </div>
+                              <div class="modal-footer">
+                                <form action="{% url 'delete_brand' b.id %}" >
+                                  <button type="submit" class="btn btn-danger">Confirm</button>
+                                </form>
+                                {% comment %} <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> {% endcomment %}
+                            </div>
+                            </div>
+                          </div>
+                        </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+
+          </div>
+        </div><!-- End Recent Sales -->
+        <!-- Button trigger modal -->
+        <a type="button" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#addBrand">
+          <i class="fa fa-plus"></i>
+        </a>
+
+       <!--Add Modal -->
+       <div class="modal fade" id="addBrand" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Add Product</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'add_brand' %}" enctype="multipart/form-data" method="POST">
+                {% csrf_token %}
+
+                <div class="form-outline mb-4">
+                  <input name="image" type="file" accept="image/png, image/jpeg, image/svg" class="form-control"/>
+                </div>
+
+                <div class="form-outline mb-4">
+                  <input name='brand_name'  type="text" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Brand name</label>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button type="submit"
+                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+{% endblock body %}

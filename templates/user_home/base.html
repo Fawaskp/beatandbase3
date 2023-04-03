@@ -1,0 +1,292 @@
+{% comment %}
+
+blocks used in base.html
+> title
+> links
+> body
+> main_carousel
+> search
+
+{% endcomment %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock title %}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    {% block links %}
+    {% endblock links %}
+    <!-- Favicon -->
+    <link href="{% static 'user_home/images/logo.png' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'user_home/lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'user_home/css/style.css' %}" rel="stylesheet">
+
+    <!-- Ajax -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    
+
+    <!-- Bootstrap Js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sweet alert -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
+
+</head>
+
+
+
+<body  id="body">
+
+
+    <!-- Topbar Start -->
+    <div class="container-fluid">
+        <div class="row align-items-center py-3 px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                    <div class="logo-img overflow-hidden">
+                <a href="{% url 'index_page' %}" class="text-decoration-none">
+                    <img class="w-75" src="{% static 'user_home/images/icon.png' %}" alt="">
+                </a>
+            </div>
+            </div>
+            
+            <div class="col-lg-6 col-12 text-left">
+                    {% block search %}
+                    <form action="{% url 'user_search_product' %}" method='POST'>
+                        {% csrf_token %}
+                            <div class="input-group">
+                                <input name="search_text" required type="text" class="form-control" placeholder="Search for products">
+                                <div class="input-group-append" style="background-color: #D93636 !important;">
+                                    <span class="input-group-text bg-transparent text-primary">
+                                        <button type="submit" class="btn p-0"><i class="fa fa-search" style="color: white;"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    {% endblock search %}
+            </div>
+            <div class="col-lg-3 col-12 p-2 text-right">
+                <a href="{% url 'wishlist' %}" {% if not request.user.is_authenticated %} onclick="alert('not logged in')"{% endif %}  class="btn border">
+                    <i class="fas fa-heart text-primary"></i>
+                    <span class="badge">
+                        {{wishlist}}
+                    </span>
+                </a>
+                <a href="{% url 'cart-summary' %}" class="btn border">
+                    <i class="fas fa-shopping-cart text-primary"></i>
+                    <span id="cart-qty" class="badge">
+                        
+                        {% if cart_qty > 0 %}
+                        
+                            {{ cart_qty }}
+                        
+                        {% else %}
+
+                            0
+                        
+                        {% endif %}
+                        
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid mb-3">
+        <div class="row border-top px-xl-5">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+                    <a href="" class="text-decoration-none d-block d-lg-none">
+                        <div class="logo-img overflow-hidden">
+                            <img class="w-75" src="{% static 'user_home/images/icon.png' %}" alt="">
+                        </div>
+                    </a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <div class="navbar-nav mr-auto py-0">
+                            <a href="{% url 'user_products' %}" class="nav-item nav-link 
+                            {% if request.path == '/user_products/' %}active{% endif %}">All</a>
+                            <a href="{% url 'index_page' %}" class="nav-item nav-link 
+                            {% if request.path == '/' %}active{% endif %}">Home</a>
+                            <a href="{% url 'categories' %}" class="nav-item nav-link
+                            {% if request.path == '/categories' %}active{% endif %}">Categories</a>
+                            <!-- <a href="" class="nav-item nav-link disabled">Brand</a> (Hide to do in future) -->
+                        </div>
+                        <div class="navbar-nav ml-auto py-0">
+                            <a {% if not request.user.is_authenticated %} onclick="alert('not logged in')"{% endif %} href="{% url 'user_orders' %}" class="nav-item nav-link
+                            {% if request.path == '/orders/' %}active{% endif %}">Orders</a>
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link" data-toggle="dropdown">
+                                    <span class="bg-light border  rounded-pill p-2">
+                                    <div class="d-inline-block " style="width: 30px; height: 30px;">
+                                        {% if  user.is_authenticated %}
+                                            {% if user.user_image %}
+                                                <img class="w-100 rounded-circle " src="{{request.user.user_image.url}}" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                                            {% else %}
+                                            <i class="fa fa-user fa-lg"></i>
+                                            {% endif %}
+                                        {% else %}
+                                                <i class="fa fa-user fa-lg"></i>
+                                        {% endif %}
+                                    </div>
+                                        {% if request.user.is_authenticated %}
+                                        Hi, {{request.user.username}}
+                                        {% endif %}
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu bg-secondary border-0 rounded-0 m-0" style="margin-left: -32px!important;">
+
+                                    {% if request.user.is_authenticated %}
+                                        {% if request.user.is_superuser %}
+                                        <a class="dropdown-item"><del>User Profile</del></a>
+                                        <a href="{% url 'user_logout' %}" class="dropdown-item">Logout</a>
+                                        {% else %}
+                                        <a href="{% url 'user_profile' %}" class="dropdown-item">User Profile</a>
+                                        <a href="{% url 'user_logout' %}" class="dropdown-item">Logout</a>
+                                        {% endif %}
+                                        {% else %}
+                                        <a href="{% url 'user_logout' %}" class="dropdown-item">Login</a>
+                                        <a href="{% url 'user_register' %}" class="dropdown-item">Register</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                {% block main_carousel %}
+
+                {% endblock main_carousel %}
+            </div>
+        </div>
+    </div>
+        <!-- Navbar End -->
+
+        {% block body %}
+
+        {% endblock body %}
+
+        {% block brands %}
+        
+        {% endblock brands %}
+
+        <!-- Footer Start -->
+        <div class="container-fluid bg-secondary text-dark  pt-5">
+            <div class="row px-xl-5 pt-5">
+                <div class="col-lg-8 col-md-12 mb-5 pr-3 pr-xl-5">
+                    <a href="" class="text-decoration-none">
+                        <div class="logo-img overflow-hidden">
+                            <img class="w-75" src="{% static 'user_home/images/icon.png' %}" alt="">
+                        </div>
+                    </a>
+                    <p>Beatandbase is a company that specializes in selling high-quality headphones that provide 
+                        an exceptional audio experience. The company is dedicated to providing music lovers with the best 
+                        listening experience possible, by offering headphones that are not only stylish but also deliver 
+                        crystal-clear sound.
+                    </p>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>beatandbase@gmail.com</p>
+                    <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+91 345 67890</p>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="row">
+
+                        <div class="col-md-4 mb-5">
+                            {% comment %} <h5 class="font-weight-bold text-dark mb-4">Quick Links</h5> {% endcomment %}
+                            <div class="d-flex flex-column justify-content-start">
+                                <a href="{% url 'index_page' %}" class="text-dark mb-2" href="index.html"><i
+                                        class="fa fa-angle-right mr-2"></i>Home</a>
+                                <!-- <a class="text-dark mb-2" href="shop.html"><i class="fa fa-angle-right mr-2"></i>Our
+                                    Shop</a>
+                                <a class="text-dark mb-2" href="detail.html"><i class="fa fa-angle-right mr-2"></i>Shop
+                                    Detail</a> -->
+                                <a href="{% url 'cart-summary' %}"  class="text-dark mb-2" href="cart.html"><i
+                                        class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
+                                <!-- <a class="text-dark mb-2" href="checkout.html"><i
+                                        class="fa fa-angle-right mr-2"></i>Checkout</a>
+                                <a class="text-dark" href="contact.html"><i class="fa fa-angle-right mr-2"></i>Contact
+                                    Us</a> -->
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-4 mb-5">
+                        <h5 class="font-weight-bold text-dark mb-4">Newsletter</h5>
+                        <form action="">
+                            <div class="form-group">
+                                <input type="text" class="form-control border-0 py-4" placeholder="Your Name" required="required" />
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control border-0 py-4" placeholder="Your Email"
+                                    required="required" />
+                            </div>
+                            <div>
+                                <button class="btn btn-primary btn-block border-0 py-3" type="submit">Subscribe Now</button>
+                            </div>
+                        </form>
+                    </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="row border-top border-light mx-xl-5 py-4">
+                <div class="col-md-6 px-xl-0">
+                    <p class="mb-md-0 text-center text-md-left text-dark">
+                        &copy; <a class="text-dark font-weight-semi-bold" href="#">beatandbase</a>. All Rights Reserved.
+                    </p>
+                </div>
+                <div class="col-md-6 px-xl-0 text-center text-md-right">
+                    <img class="img-fluid" src="{% static 'user_home/images/payments.png' %}" alt="">
+                </div>
+            </div>
+        </div>
+        <!-- Footer End -->
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+        <!-- JavaScript Libraries -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{% static 'user_home/lib/easing/easing.min.js' %}"></script>
+        <script src="{% static 'user_home/lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+        <!-- Contact Javascript File -->
+        <script src="{% static 'user_home/mail/jqBootstrapValidation.min.js' %}"></script>
+        <script src="{% static 'user_home/mail/contact.js' %}"></script>
+
+        <!-- Template Javascript -->
+        <script src="{% static 'user_home/js/main.js' %}"></script>
+        <!-- add to cart request to django views -->
+
+        <!-- Sweet alert -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+
+        {% block bottomlinks %}
+
+        {% endblock bottomlinks %}
+</body>
+
+</html>

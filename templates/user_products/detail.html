@@ -1,0 +1,664 @@
+{% extends 'user_home/base.html' %}
+{% load static %}
+
+{% block title %}
+{{m_product.product_name}}
+{% endblock title %}
+
+{% block links %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Sweet alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
+
+{% endblock links %}
+
+{% block body %}
+    <!-- Shop Detail Start -->
+    <div class="container-fluid py-5">
+      
+            <div class="row px-xl-5">
+            <div class="col-lg-5 pb-5">
+                <div id="product-carousel" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner variant_image_carousel border">
+                       
+                    </div>
+                    <a class="carousel-control-prev" href="#product-carousel" data-slide="prev">
+                        <i class="fa fa-2x fa-angle-left text-dark"></i>
+                    </a>
+                    <a class="carousel-control-next" href="#product-carousel" data-slide="next">
+                        <i class="fa fa-2x fa-angle-right text-dark"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-7 pb-5">
+                <h3 class="font-weight-semi-bold">
+                    {{m_product.product_name}}
+                    <a href="{% url 'add-wishlist' m_product.id %}" class="btn btn-light text-primary mx-5 pt-2">
+                        add to wishlist
+                    </a>
+                </h3>
+                <div class="d-flex mb-3">
+                    <div class="text-primary mr-2">
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star-half-alt"></small>
+                        <small class="far fa-star"></small>
+                    </div>
+                    <small class="pt-1">(50 Reviews)</small>
+
+                </div>
+                <div class="py-2 px-1">
+                    <span class="text-dark">
+                        Brand : {{m_product.brand}}
+                     </span>
+                </div>
+
+                <div class="py-2 px-1">
+                    
+                <span class="text-dark">
+                    Type : {{m_product.category }}
+                 </span>
+                </div>
+               
+
+            <h3 class="font-weight-semi-bold mb-4" id="product_price">₹{{m_product.product_price}}</h3> 
+            <span id="out-of-stock" style="display: none;" class="text-danger">
+                out of stock
+            </span>
+            <span id="stock-count" class="text-warning">
+               
+            </span>
+
+                <p class="mb-4">
+                   {{m_product.product_detail}}
+                </p>
+
+                <div class="form-group w-50 mb-4">
+                    <select id="product_variant" class="form-control" id="dropdownInput">
+                      {% for v in variants  %}
+                      <option  value="{{v.id}}">{{v.color}}</option>
+                      {% endfor %}
+                    </select> 
+                  </div>     
+                {% comment %} <div class="d-flex mb-4">
+                    <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
+                    <form>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="color-1" name="color">
+                            <label class="custom-control-label" for="color-1">Black</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="color-2" name="color">
+                            <label class="custom-control-label" for="color-2">White</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="color-3" name="color">
+                            <label class="custom-control-label" for="color-3">Red</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="color-4" name="color">
+                            <label class="custom-control-label" for="color-4">Blue</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="color-5" name="color">
+                            <label class="custom-control-label" for="color-5">Green</label>
+                        </div>
+                    </form>
+                </div> {% endcomment %}
+
+                <div class="d-flex align-items-center mb-4 pt-2">
+                    <div class="input-group quantity mr-3" style="width: 130px;">
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary btn-minus" >
+                            <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <input id="quantity" type="text" class="form-control bg-secondary text-center" value="1">
+                        <div class="input-group-btn">
+                            <button onclick="add_quantity('{{m_product.id}}')" class="btn btn-primary btn-plus">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                   
+                    
+                    <button id="add-cart" value="{{m_product.id}}" class="btn btn-primary  mx-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+                    
+                    <a href="{% url 'cart-summary' %}">
+                        <button style="display: none;" id="js-added-cart" value="{{m_product.id}}" class="btn btn-success mx-3"><i class="fa fa-shopping-cart mr-1"></i> Go to cart</button>
+                    </a>
+
+                    <a>   
+                        <button  class="ms-3 btn btn-primary px-3 checkout-button">Buy now</button>
+                    </a>
+                </div>  
+                <!-- <div class="d-flex pt-2">
+                    <p class="text-dark font-weight-medium mb-0 mr-2">Share on:</p>
+                    <div class="d-inline-flex">
+                        <a class="text-dark px-2" href="">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="text-dark px-2" href="">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="text-dark px-2" href="">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a class="text-dark px-2" href="">
+                            <i class="fab fa-pinterest"></i>
+                        </a>
+                    </div>
+                </div> -->
+            </div>
+        </div> 
+        <div class="row px-xl-5">
+            <div class="col">
+                <div class="nav nav-tabs justify-content-center border-secondary mb-4">
+                    <a class="nav-item nav-link active" data-toggle="tab" href="#tab-pane-1">Description</a>
+                    {% comment %} <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-2">Information</a> {% endcomment %}
+                    <!-- <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-3">Reviews (0)</a> -->
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab-pane-1">
+                        <h4 class="mb-3">Product Description</h4>
+                        <p>
+                            {{m_product.product_description}}
+                        </p>
+                    </div>
+    
+
+                    <div class="tab-pane fade" id="tab-pane-2">
+                        <h4 class="mb-3">Additional Information</h4>
+                        <p>Eos no lorem eirmod diam diam, eos elitr et gubergren diam sea. Consetetur vero aliquyam invidunt duo dolores et duo sit. Vero diam ea vero et dolore rebum, dolor rebum eirmod consetetur invidunt sed sed et, lorem duo et eos elitr, sadipscing kasd ipsum rebum diam. Dolore diam stet rebum sed tempor kasd eirmod. Takimata kasd ipsum accusam sadipscing, eos dolores sit no ut diam consetetur duo justo est, sit sanctus diam tempor aliquyam eirmod nonumy rebum dolor accusam, ipsum kasd eos consetetur at sit rebum, diam kasd invidunt tempor lorem, ipsum lorem elitr sanctus eirmod takimata dolor ea invidunt.</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item px-0">
+                                        Sit erat duo lorem duo ea consetetur, et eirmod takimata.
+                                    </li>
+                                    <li class="list-group-item px-0">
+                                        Amet kasd gubergren sit sanctus et lorem eos sadipscing at.
+                                    </li>
+                                    <li class="list-group-item px-0">
+                                        Duo amet accusam eirmod nonumy stet et et stet eirmod.
+                                    </li>
+                                    <li class="list-group-item px-0">
+                                        Takimata ea clita labore amet ipsum erat justo voluptua. Nonumy.
+                                    </li>
+                                  </ul> 
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item px-0">
+                                        Sit erat duo lorem duo ea consetetur, et eirmod takimata.
+                                    </li>
+                                    <li class="list-group-item px-0">
+                                        Amet kasd gubergren sit sanctus et lorem eos sadipscing at.
+                                    </li>
+                                    <li class="list-group-item px-0">
+                                        Duo amet accusam eirmod nonumy stet et et stet eirmod.
+                                    </li>
+                                    <li class="list-group-item px-0">
+                                        Takimata ea clita labore amet ipsum erat justo voluptua. Nonumy.
+                                    </li>
+                                  </ul> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab-pane-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4 class="mb-4">1 review for "Colorful Stylish Shirt"</h4>
+                                <div class="media mb-4">
+                                    <img src="{% static 'user_home/images/user.jpg' %}" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
+                                    <div class="media-body">
+                                        <h6>John Doe<small> - <i>01 Jan 2045</i></small></h6>
+                                        <div class="text-primary mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <p>Diam amet duo labore stet elitr ea clita ipsum, tempor labore accusam ipsum et no at. Kasd diam tempor rebum magna dolores sed sed eirmod ipsum.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="mb-4">Leave a review</h4>
+                                <small>Your email address will not be published. Required fields are marked *</small>
+                                <div class="d-flex my-3">
+                                    <p class="mb-0 mr-2">Your Rating * :</p>
+                                    <div class="text-primary">
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                </div>
+                                <form>
+                                    <div class="form-group">
+                                        <label for="message">Your Review *</label>
+                                        <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="name">Your Name *</label>
+                                        <input type="text" class="form-control" id="name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Your Email *</label>
+                                        <input type="email" class="form-control" id="email">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <input type="submit" value="Leave Your Review" class="btn btn-primary px-3">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Shop Detail End -->
+
+
+    <!-- Products Start -->
+    <div class="container-fluid py-5">
+        <div class="text-center mb-4">
+            <h2 class="section-title px-5"><span class="px-2">You May Also Like</span></h2>
+        </div>
+        <div class="row px-xl-5">
+            <div class="col">
+                <div class="owl-carousel related-carousel">
+                    {% for p in products  %}
+                    <div class="card product-item border-0">
+                        <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                            <a href="{% url 'product_detail' p.id %}">
+                                <img class="img-fluid w-100" src="{{p.product_img.url}}" alt="">
+                            </a>
+                        </div>
+                        <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                            <h6 class="text-truncate mb-3">{{p.product_name}}</h6>
+                            <div class="d-flex justify-content-center">
+                                <h6>₹{{p.product_price}}</h6>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between bg-light border">
+                            <a href="" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- Products End -->
+{% endblock body %}
+
+{% block bottomlinks %}
+
+
+
+<!-- for image zoom on hover -->
+<script src="{% static 'user_product/js/zoomsl.js' %}"></script>
+<script src="{% static 'user_product/js/zoomsl.min.js' %}"></script>
+
+<script src="{% static 'user_product/js/detail.js' %}"></script>
+
+
+<script>
+
+
+// storing the default variant details to variables
+$(document).ready(function () {
+
+variant_id = $('#product_variant').val()
+const varinat_image_src = []
+
+
+{% for v in variants  %}
+
+    if ('{{v.id}}' == variant_id){
+
+        {% for variant_image in variant_images  %}
+            {% if variant_image.variant.id == v.id %}
+
+                varinat_image_src.push('{{variant_image.image.url}}')
+            
+            {% endif %}
+        {% endfor %}
+
+
+    const carousel = document.querySelector('.variant_image_carousel');
+
+    // making the carousel div and images
+    varinat_image_src.forEach((product, index) => {
+
+        // create a new carousel item
+        const carouselItem = document.createElement('div');
+        carouselItem.style.height = '500px'
+        carouselItem.classList.add('z-3', 'text-center', 'carousel-item');
+        if (index == 0) {
+            carouselItem.classList.add('active');
+        }
+
+        // create a new image element and set its attributes
+        const img = document.createElement('img');
+        img.classList.add('h-100', 'zoom_image');
+        img.setAttribute('src', varinat_image_src[index]);
+        img.setAttribute('alt', 'Image');
+
+        // append the image element to the carousel item
+        carouselItem.appendChild(img);
+
+        // append the carousel item to the carousel
+        carousel.appendChild(carouselItem);
+
+    });
+
+    document.getElementById('product_price').textContent = '₹{{v.price}}'
+
+    if('{{v.quantity}}' < 1){
+
+        document.getElementById('stock-count').textContent = '' 
+        document.getElementById('out-of-stock').style.display = 'block'
+
+        }
+        else if('{{v.quantity}}' <= 5){
+            document.getElementById('out-of-stock').style.display = 'none'
+            document.getElementById('stock-count').textContent = 'only {{v.quantity}} left' 
+
+        }
+        else{
+            // console.log('varaint id = {{v.id}}')
+            // console.log('varaint quantity = {{v.quantity}}')
+            document.getElementById('out-of-stock').style.display = 'none'
+            document.getElementById('stock-count').textContent = '' 
+        }
+
+
+    {% for item in cart  %}
+    {% with variant=item.variant  %}
+    
+    if( '{{variant.id}}' == variant_id ){
+            
+
+        document.getElementById('add-cart').style.display = 'none'
+        document.getElementById('js-added-cart').style.display = 'inline'
+
+
+    }
+
+    else{
+
+        document.getElementById('js-added-cart').style.display = 'none'
+        document.getElementById('add-cart').style.display = 'inline'
+    }
+    
+    {% endwith %}
+    {% endfor %}
+
+    }
+
+{% endfor %}
+
+})
+
+
+// make change in stock count, price when changing the variant
+document.getElementById("product_variant").addEventListener("change", (event) => {
+    
+const variant_id = event.target.value;
+const varinat_image_src = []
+
+    
+
+// changing the variant image when selecting another variant
+{% for v in variants  %}
+
+    if ('{{v.id}}' == variant_id){
+
+        {% for variant_image in variant_images  %}
+            {% if variant_image.variant.id == v.id %}
+
+                varinat_image_src.push('{{variant_image.image.url}}')
+            
+            {% endif %}
+        {% endfor %}
+
+    const carousel = document.querySelector('.variant_image_carousel');
+
+    // making the carousel div and images
+
+            // remove old images
+            while (carousel.firstChild) {
+        carousel.removeChild(carousel.firstChild);
+        }
+    varinat_image_src.forEach((product, index) => {
+
+        // create a new carousel item
+        const carouselItem = document.createElement('div');
+        carouselItem.style.height = '500px'
+        carouselItem.classList.add('z-3', 'text-center', 'carousel-item');
+        if (index == 0) {
+            carouselItem.classList.add('active');
+        }
+
+        // create a new image element and set its attributes
+        const img = document.createElement('img');
+        img.classList.add('h-100', 'zoom_image');
+        img.setAttribute('src', varinat_image_src[index]);
+        img.setAttribute('alt', 'Image');
+
+        // append the image element to the carousel item
+        carouselItem.appendChild(img);
+
+        // append the carousel item to the carousel
+        carousel.appendChild(carouselItem);
+
+    });
+    $(".zoom_image").imagezoomsl({
+        zoomrange:[3,3],
+    })
+
+
+    document.getElementById('product_price').textContent = '₹{{v.price}}'
+
+    if('{{v.quantity}}' < 1){
+
+    document.getElementById('stock-count').textContent = '' 
+    document.getElementById('out-of-stock').style.display = 'block'
+
+
+    }
+    else if('{{v.quantity}}' <= 5){
+        document.getElementById('out-of-stock').style.display = 'none'
+        document.getElementById('stock-count').textContent = 'Hurry only {{v.quantity}} left' 
+    }
+    else{
+        document.getElementById('out-of-stock').style.display = 'none'
+        document.getElementById('stock-count').textContent = '' 
+    }
+
+
+    // checking whether the selected variant is there in cart or not, and making changes in buttons
+    {% for item in cart  %}
+    {% with variant=item.variant  %}
+    
+    if( '{{variant.id}}' == variant_id ){
+            
+
+        document.getElementById('add-cart').style.display = 'none'
+        document.getElementById('js-added-cart').style.display = 'inline'
+
+
+    }
+
+    else{
+
+        document.getElementById('js-added-cart').style.display = 'none'
+        document.getElementById('add-cart').style.display = 'inline'
+    }
+    
+
+    {% endwith %}
+    {% endfor %}
+
+    }
+{% endfor %} 
+})
+    
+
+
+// adding the quantity of product
+function add_quantity(pro_id){
+old_qty = document.getElementById('quantity').value
+variant_id = $('#product_variant').val()
+{% for v in variants  %}
+
+    if ('{{v.id}}' == variant_id){
+
+    if('{{v.quantity}}' <= $('#quantity').val()){
+
+        Swal.fire(
+            'Oops!',
+            'only {{v.quantity}} left',
+            'warning'
+            )
+
+        document.getElementById('quantity').value = old_qty -1
+        return;
+        }
+    }
+{% endfor %}
+}
+
+
+// actions to do after pressing the add-to-cart button
+$(document).on('click','#add-cart',function(e){
+
+e.preventDefault();
+
+if (document.getElementById('quantity').value < 1){
+    Swal.fire(
+            'Oops!',
+            'Entered wrong entry',
+            'warning'
+            )
+    return;
+}
+
+variant_id = $('#product_variant').val()
+    {% for v in variants  %}
+        if ('{{v.id}}' == variant_id){
+        if('{{v.quantity}}' < $('#quantity').val()){
+
+            Swal.fire(
+                'Sorry!',
+                'Out of stock',
+                'error'
+                )
+            return;
+            }
+
+        }
+
+    {% endfor %}
+        $.ajax({
+            type:'POST',
+            url:"{% url 'cart-add' %}",
+            data:{
+                product_id:$('#add-cart').val(),
+                product_quantity:$('#quantity').val(),
+                product_variant:$('#product_variant').val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action:'post'
+            },
+            success: function(json){
+                console.log(json)
+
+                document.getElementById('cart-qty').textContent = json.cart_qty
+                document.getElementById('js-added-cart').style.display = 'inline'
+                document.getElementById('add-cart').style.display = 'none'
+
+                Swal.fire(
+                    'Good job!',
+                    'Item added to your cart',
+                    'success'
+                    )
+            },
+            error: function(xhr, errmshg, err){
+
+            } 
+        });
+
+});
+
+
+
+
+// actions related to when pressing buy now button
+$(document).on('click','.checkout-button',function(e){
+    e.preventDefault();
+    if (document.getElementById('quantity').value < 1){
+        Swal.fire(
+                'Oops!',
+                'Entered wrong entry',
+                'warning',
+                )
+        return;
+        }
+    {% for v in variants  %}
+        if ('{{v.id}}' == variant_id){
+            if('{{v.quantity}}' < $('#quantity').val()){
+            Swal.fire(
+                'Sorry!',
+                'Out of stock',
+                'error'
+                )
+            return;
+            }
+        }
+    {% endfor %}
+
+    $.ajax({
+        type:'POST',
+        url:"{% url 'checkout' %}",
+        data:{
+            action:'post',
+            product_id:$('#add-cart').val(),
+            product_quantity:$('#quantity').val(),
+            product_variant:$('#product_variant').val(),
+            csrfmiddlewaretoken: "{{csrf_token}}",
+        },
+        success: function(json){
+            console.log(json)
+            window.location.replace('/checkout')
+        },
+
+        error: function(xhr, errmshg, err){
+        }
+
+    });
+});
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+      
+      $(".zoom_image").imagezoomsl({
+          zoomrange:[3,3],
+      })
+       
+      })
+</script>
+
+{% endblock bottomlinks %}

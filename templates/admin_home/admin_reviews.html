@@ -1,0 +1,143 @@
+{% extends 'admin_home/base.html' %}
+{% load mathfilters %}
+{% block title %}
+Orders
+{% endblock title %}
+
+
+
+
+{% block body %}
+
+{% for m in messages %}
+<div class="alert alert-info" role="alert">
+  {{m}}
+</div>
+{% endfor %}
+
+<div class="pagetitle">
+  <h1>Orders</h1>
+</div><!-- End Page Title -->
+
+<section class="section dashboard">
+  <div class="row">
+
+    <!-- Left side columns -->
+    <div class="col-lg-12">
+      <div class="row">
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+          <div class="card recent-sales overflow-auto">
+
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              {% comment %} <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filter</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">This Month</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+              </ul> {% endcomment %}
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title">Recent Sales <span></span></h5>
+
+              <table class="table table-borderless datatable">
+                <thead>
+                  <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Review</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for review in reviews  %}
+                  <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <th scope="row">{{review.updated_at}}</th>
+                    <td>{{review.user}}</td>
+                    <td> {{review.product}}</td>
+                    <td> {{review.review}} </td>
+                    <td>
+                        <!-- Button trigger modal -->
+                        <a type="button" class="fs-4 text-danger" data-bs-toggle="modal"
+                        data-bs-target="#confirmDelete{{forloop.counter}}">
+                        <i title="Delete Review" class="fa fa-trash"></i>
+                      </a>
+
+                      <!-- Modal -->
+                      <div class="modal fade" id="confirmDelete{{forloop.counter}}" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h2 class="modal-title fs-5" id="exampleModalLabel">Confirm Delete</h2>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <h5>
+                                delete review <span class="text-danger">'{{review.review}}'</span>
+                              </h5>
+                            </div>
+                            <div class="modal-footer">
+                              <form action="{% url 'delete-review' %}" method="POST">
+                                {% csrf_token %}
+                                <input name="review_id" type="hidden" value="{{review.id}}">
+                                <button type="submit" class="btn btn-danger">Confirm</button>
+                              </form>
+                              {% comment %} <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close</button> {% endcomment %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      </form>
+                      
+                    </td>
+                  </tr>
+
+                  {%  endfor %}
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+        </div><!-- End Recent Sales -->
+
+      </div>
+    </div><!-- End Left side columns -->
+
+<script>
+
+  $(document).on('change', '#select-status', function(e){
+
+    
+    $.ajax({
+      type:'POST',
+      url:"{% url 'change-order-status' %}",
+      data:{
+        item_id:$(this).data('id'),
+        status:$(this).val(),
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action:'post'
+      },
+      success: function(json){
+
+      }
+    })
+
+  })
+
+</script>
+
+
+
+{% endblock body %}

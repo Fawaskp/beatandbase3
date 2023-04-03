@@ -1,0 +1,221 @@
+{% extends 'user_home/base.html' %}
+{% load static %}
+{% load my_filters %}
+
+{% block title %}
+Beatandbase
+{% endblock title %}
+{% block main_carousel %}
+<div id="header-carousel" class="carousel slide" data-ride="carousel">
+    <div class="carousel-inner">
+        {% for index in ad %}
+        <div class="carousel-item {% if index.id == 1%}active{% endif %}" style="height: 410px;">
+            <img class="img-fluid" src="{{ index.ad_image.url }}" alt="Image">
+            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                <div class="p-3" style="max-width: 700px;">
+                    <h4 class="text-light text-uppercase font-weight-medium mb-3">10% Off Your First Order</h4>
+                    <h3 class="display-4 text-white font-weight-semi-bold mb-4">{{index.brand}}</h3>
+                    {% comment %} <a href="" class="btn btn-light py-2 px-3">Shop Now</a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <a class="carousel-control-prev" href="#header-carousel" role="button" data-slide="prev">
+        <div class="btn btn-dark" style="width: 45px; height: 45px;">
+            <span class="carousel-control-prev-icon mb-n2"></span>
+        </div>
+    </a>
+    <a class="carousel-control-next" href="#header-carousel" role="button" data-slide="next">
+        <div class="btn btn-dark" style="width: 45px; height: 45px;">
+            <span class="carousel-control-next-icon mb-n2"></span>
+        </div>
+    </a>
+</div>
+{% endblock main_carousel %}
+
+{% block body %}    
+
+<div class="container-fluid">
+    <div class="row pt-4 ">
+        <div class="row col-12 px-xl-5">
+            <!-- Shop Sidebar Start -->
+            <div class="col-lg-3 col-md-12 p-3">
+
+                <form method="GET" id="filter_form">
+                <!-- Brand Start -->
+                <div class="border-bottom mb-4 pb-4">
+                    <h5 class="font-weight-semi-bold mb-4">Filter by Brand</h5>
+                    {% for brand in brands %}
+                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            {% if brand.product_set.count  %}
+                            <input onclick="submit()" type="checkbox" class="custom-control-input" id="{{ brand.brand_name }}" name="brand" value="{{ brand.brand_id }}" multiple>
+                            <script>
+                                var brand_ID = '{{brand.brand_id}}';
+
+                                    var inputElement = document.querySelector('#{{ brand.brand_name }}');
+                                    
+                                    var urlParams = new URLSearchParams(window.location.search);
+                                    var brandId = urlParams.getAll('brand');
+
+                                    for(i=0;i<brandId.length;i++){
+                                        if (brandId[i] === brand_ID) {
+                                        inputElement.checked = true;
+                                        console.log('checked');
+                                        }
+                                    }
+                            </script>
+                            {% else %}
+                            <input disabled type="checkbox" class="custom-control-input"  name="brand" value="{{ brand.brand_id }}">
+                            {% endif %}
+                            
+                            <label class="custom-control-label" for="{{ brand.brand_name }}">
+                            <img style="width: 22px;" class="mx-1" src="{{brand.brand_img.url}}" alt="">
+                            {{ brand.brand_name }}</label>
+                            <span class="badge border font-weight-normal">{{ brand.product_count }}</span>
+                        </div>
+                    {% endfor %}
+                </div>  
+                <!-- Brand End -->
+                
+                <!-- Category Start -->
+                <div class="border-bottom mb-4 pb-4">
+                    <h5 class="font-weight-semi-bold mb-4">Filter by Category</h5>
+                    {% for category in categories %}
+                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                        {% if category.product_set.count  %}
+                        <input onclick="submit()" type="checkbox" class="custom-control-input" id="{{ category.category_name }}" name="category" value="{{ category.id }}">
+                        <script>
+                            var cat_ID = '{{category.id}}';
+
+                                var inputElement = document.querySelector('#{{ category.category_name }}');
+                                
+                                var urlParams = new URLSearchParams(window.location.search);
+                                var CatID = urlParams.getAll('category');
+
+
+                                for(i=0;i<CatID.length;i++){
+                                    if (CatID[i] === cat_ID) {
+                                    inputElement.checked = true;
+                                    console.log('checked');
+                                    }
+                                }
+                        </script>
+                        {% else %}
+                        <input disabled type="checkbox" class="custom-control-input" name="category" value="{{ category.id }}">
+                        {% endif %}
+                        <label class="custom-control-label" for="{{ category.category_name }}">{{ category.category_name }}</label>
+                        <span class="badge border font-weight-normal">{{ category.product_count }}</span>
+                    </div>
+                {% endfor %}
+                </div>
+                <!-- Category End -->
+
+            </form>
+                
+            </div>
+            <!-- Shop Sidebar End -->
+
+           
+        <!-- Shop Product Start -->
+        <div class="col-lg-9">
+            <div class="row pb-3">
+                <div class="col-12 pb-1">
+                    <div class="d-flex align-items-center justify-content-end mb-4">
+                        <div class="dropdown ml-4 w-25">
+                            <button class="btn border dropdown-toggle w-100" type="button" id="triggerId" data-toggle="dropdown" aria-haspopup="true"aria-expanded="false">
+                            Sort by
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="triggerId">
+                                <form action="" method="get">
+                                    <a class="dropdown-item" href="?sort_by=name_a_to_z">Sort by Name: A to Z</a>
+                                    <a class="dropdown-item" href="?sort_by=name_z_to_a">Sort by Name: Z to A</a>
+                                    <a class="dropdown-item" href="?sort_by=price_low_to_high">Sort by Price: Low to High</a>
+                                    <a class="dropdown-item" href="?sort_by=price_high_to_low">Sort by Price: High to Low</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    {% if variants %}
+                            {% for variant in variants %}
+                            <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+                                <div class="card product-item border-0 mb-4">
+
+                                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                            {% if variant.thumbnail %}
+                                            <a target="_blank" href="{% url 'variant_detail' variant.id %}">
+                                            <img class="img-fluid w-100" src="{{variant.thumbnail.url}}" alt="">
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                                        <h6 class="text-truncate mb-3">{{variant.product}}</h6>
+                                         <div class="d-flex justify-content-center">
+                                            <h6>₹ {{variant.price}}</h6>
+                                        </div> 
+                                        <div class="d-flex justify-content-center">
+                                       <div title="{{variant.color}}" style="background-color: {{variant.color}};" class="color-square {{variant.color.color_code}}"></div>
+                                        </div> 
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between bg-light border">
+                                        <a href="{% url 'variant_detail' variant.id %}">
+                                            <button class="btn love-button"><i class="fas fa-eye text-primary mr-1"></i>View Detail</button>
+                                        </a>
+                                        
+                                    </div>
+
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                {% else %}
+                <h3 class="text-center w-100"><span class="text-danger" >Sorry</span> no products found</h3>
+                {% endif %}
+
+
+                <div class="col-12 pb-1">
+                    <nav aria-label="Page navigation">
+                        {% if variants.has_other_pages %}
+                        <ul class="pagination justify-content-center mb-3">
+        
+                            {% if variants.has_previous %}
+                            <li class="page-item "><a href="?page={{variants.previous_page_number}}"
+                                    class="page-link text-dark">Previous</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><a href="#" class="page-link">Previous</a></li>
+                            {% endif %}
+        
+                            {% for i in variants.paginator.page_range %}
+                            {% if variants.number == i %}
+                            <li class="page-item active"><a href="#" class="page-link">{{i}}</a></li>
+                            {% else %}
+                            <li class="page-item"><a href="?page={{i}}" class="page-link text-dark">{{i}}</a></li>
+                            {% endif %}
+                            {% endfor %}
+        
+                            {% if variants.has_next %}
+                            <li class="page-item"><a href="?page={{variants.next_page_number}}"
+                                    class="page-link text-dark p-lr-25">Next</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><a href="#" class="page-link p-lr-25">Next</a></li>
+                            {% endif %}
+                        </ul>
+        
+                        {% endif %}
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+        <!-- Shop Product End -->
+    </div>
+</div>
+</div>
+<!-- Shop End -->
+
+
+
+
+{% endblock body %}

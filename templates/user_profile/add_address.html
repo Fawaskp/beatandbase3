@@ -1,0 +1,82 @@
+{% extends 'user_home/base.html' %}
+
+{% block title %}
+Add new address
+{% endblock title %}
+
+
+
+{% block body %}
+
+<section style="background-color: #eee;">
+  <h3 class="text-center py-3" > Add new address </h3>
+    <div class="container ">  
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row justify-content-center">
+                <form action="" method="POST">
+                  {% csrf_token %}
+               {{form.as_p}}
+               <button type="submit" class="btn btn-primary">Submit</button>
+               <a href="{% url 'user_profile'  %}" class="btn btn-primary">Close</a>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<script>
+
+
+
+const myTextFields = document.querySelectorAll('input[data-type="form-text"]');
+    myTextFields.forEach(function(myTextField) {
+      myTextField.addEventListener("keypress", function(event) {
+        const key = event.key;
+        const isLetterOrSpace = /[a-zA-Z\s]/.test(key);
+        if (!isLetterOrSpace) {
+          myTextField.style.borderColor = "red";
+            alert("Text field never include number and characters"); // or show a message using a modal or a div element
+            setTimeout(function() {
+              myTextField.style.borderColor = ""; // reset the background color after 2 seconds
+            }, 2000);
+            event.preventDefault();
+          }
+        });
+      });
+
+   const numberfields = document.querySelectorAll('input[data-type="form-number"]');
+    numberfields.forEach(function(numberfield) {
+      numberfield.addEventListener("keypress", function(event) {
+        const key = event.key;
+        const isLetterOrSpace = /[0-9]/.test(key);
+        const value = numberfield.value + key;
+        const isFirstCharZero = value.length === 1 && value === '0';
+        if (!isLetterOrSpace || isFirstCharZero) {
+          if (key == '0'){
+            numberfield.style.borderColor = "red";
+            alert("First number should not be zero"); // or show a message using a modal or a div element
+            setTimeout(function() {
+            numberfield.style.borderColor = ""; // reset the background color after 2 seconds
+          }, 2000);
+          event.preventDefault();
+          return; 
+          }
+          numberfield.style.borderColor = "red";
+          alert("Enter valid numbers"); // or show a message using a modal or a div element
+          setTimeout(function() {
+            numberfield.style.borderColor = ""; // reset the background color after 2 seconds
+          }, 2000);
+          event.preventDefault();
+        }
+      });
+    });
+</script>
+
+
+{% endblock body %}

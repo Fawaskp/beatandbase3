@@ -1,0 +1,174 @@
+{% extends 'admin_home/base.html' %}
+
+{% block title %}
+Banner Management
+{% endblock title %}
+
+
+
+
+{% block body %}
+
+<div class="pagetitle">
+  <h1>Advertisements</h1>
+</div><!-- End Page Title -->
+
+<section class="section dashboard">
+  <div class="row">
+
+    <!-- Left side columns -->
+    <div class="col-lg-12">
+      <div class="row">
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+          <div class="card recent-sales overflow-auto">
+
+            <div class="card-body">
+
+              <table class="table table-borderless datatable">
+                <thead>
+                  <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Brand</th>
+                    <th scope="col">Banner</th>
+                    <th colspan="2" scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for a in ad  %}
+                  <tr>
+                    <th class="d-flex align-items-center" scope="row">{{a.id}}</th>
+                    <td>{{a.brand}}</td>
+                    <td><div style="width: 300px;" class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                        <img class="img-fluid w-100" src="{{a.ad_image.url}}" alt="">
+                      </div>
+                    </td>
+                    <td>
+                      <!-- Button trigger modal -->
+                      <a type="button" class="fs-4 text-warning" data-bs-toggle="modal" data-bs-target="#confirmEdit{{forloop.counter}}">
+                        <i class="fa fa-edit"></i>
+                      </a>
+
+                      <!--Edit Modal -->
+                      <div class="modal fade" id="confirmEdit{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Advertisement</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="{% url 'edit_ad' a.id %}" enctype="multipart/form-data" method="POST">
+                                {% csrf_token %}
+
+                                <div style="width: 100px;" class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                  <img class="img-fluid w-100" src="{{a.ad_image.url}}" alt="">
+                                </div> 
+
+                                <div class="form-outline mb-4">
+                                  <input name="image" type="file" accept="image/png, image/jpeg, image/svg" class="form-control"/>
+                                </div>
+                
+                                <div class="form-group mb-4">
+                                  <select name="brand_name" class="form-control" id="dropdownInput">
+                                    <option  value="{{a.brand.id}}">{{a.brand}}</option>
+                                    {% for b in brands  %}
+                                    <option  value="{{b.id}}">{{b.brand_name}}</option>
+                                    {% endfor %}
+                                  </select> 
+                                  <label for="dropdownInput">Brand</label>
+                                </div>     
+                                
+                                <div class="d-flex justify-content-center">
+                                  <button type="submit"
+                                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                                </div>
+                
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                        <!-- Delete trigger modal -->
+                        <a type="button" class="fs-4 text-danger" data-bs-toggle="modal" data-bs-target="#confirmDelete{{forloop.counter}}">
+                          <i class="fa fa-trash"></i>
+                        </a>
+  
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="confirmDelete{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h2 class="modal-title fs-5" id="exampleModalLabel">Confirm Delete</h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <h5>
+                                  delete <span class="text-danger">{{a.brand}}'s </span>banner
+                                </h5>
+                              </div>
+                              <div class="modal-footer">
+                                <form action="{% url 'delete_ad' a.id %}" >
+                                  <button type="submit" class="btn btn-danger">Confirm</button>
+                                </form>
+                                {% comment %} <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> {% endcomment %}
+                            </div>
+                            </div>
+                          </div>
+                        </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+
+          </div>
+        </div><!-- End Recent Sales -->
+        
+        <!-- Button trigger modal -->
+        <a type="button" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#addProduct">
+          <i class="fa fa-plus"></i>
+        </a>
+
+       <!--Add Modal -->
+       <div class="modal fade" id="addProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Add advertisement</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'add_ad'%}" enctype="multipart/form-data" method="POST">
+                {% csrf_token %}
+
+                <div class="form-outline mb-4">
+                  <input required name="image" type="file" accept="image/png, image/jpeg, image/svg" class="form-control"/>
+                </div>
+
+                <div class="form-group mb-4">
+                  <select required name="brand_name" class="form-control" id="dropdownInput">
+                    {% for b in brands  %}
+                    <option  value="{{b.id}}">{{b.brand_name}}</option>
+                    {% endfor %}
+                  </select>
+                  <label for="dropdownInput">Brand</label>
+                </div>        
+
+                <div class="d-flex justify-content-center">
+                  <button type="submit"
+                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+{% endblock body %}

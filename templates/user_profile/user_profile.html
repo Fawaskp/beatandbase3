@@ -1,0 +1,469 @@
+{% extends 'user_home/base.html' %}
+
+
+
+{% block title %}
+User profile
+{% endblock title %}
+
+
+
+{% block body %}
+
+<section style="background-color: #eee;">
+    <div class="container py-5">  
+      {% for m in messages  %}
+        <div class="alert alert-info" id="message" role="alert">
+          {{m}}
+        </div>
+      {% endfor %}
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="card border rounded mb-4">
+            <div class="card-body   text-center">
+             <div class="text-center mb-2 container" style="width: 100px;height: 100px; border-radius: 50%;padding: 0; overflow: hidden;">
+              {% if request.user.user_image %}
+              <img class="img-fluid" src="{{request.user.user_image.url}}" alt="avatar"
+              class="rounded-circle img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <img class="w-100 h-100" src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
+                class="rounded-circle img-fluid">
+                {% endif %}
+             </div>
+             <a  data-bs-toggle="modal" data-bs-target="#changedp">
+              <button class="btn btn-danger w-25 btn-hover" style="font-size: 10px;">Change</button>
+            </a>
+
+
+            <!--Edit Modal -->
+            <div class="modal fade" id="changedp" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="" id="exampleModalLabel">User Image</h5>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                      <i class="fa fa-times"></i>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="{% url 'change_dp' %}" enctype="multipart/form-data" method="POST">
+                      {% csrf_token %}
+      
+                      <div class="form-outline mb-4">
+                        <input name='user_image'   type="file" id="form3Example3cg" class="form-control form-control-lg" />
+                        <label class="form-label" for="form3Example3cg">User Image</label>
+                      </div>
+      
+                      <div class="d-flex justify-content-center">
+                        <button type="submit"
+                          class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                      </div>
+      
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+              <h5 class="my-3">
+                {{request.user.username}}
+             </h5>
+
+             <div class="row justify-content-between py-3">
+              <div class="col-sm-3">
+                <p class="mb-0">Wallet</p>
+              </div>
+              <div class="col-sm-6">
+                <p class="text-success mb-0 h5 text-end">
+                  ₹ {{request.user.wallet|floatformat:0}} 
+                </p>
+              </div>
+            </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="card border rounded  mb-4"> 
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Full Name</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">
+                    {{user.username}}
+                  </p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Email</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">
+                    {{request.user}}
+                  </p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Mobile</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">
+                    {% if request.user.phone %}
+                    {{request.user.phone}}
+                    {% else %}
+                    <tag class="text-danger">Not provided</tag> 
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+           <!-- Button trigger modal -->
+        <a type="button" data-bs-toggle="modal" data-bs-target="#editprofile">
+          <button class="btn btn-outline-danger"> Edit Profile </button>
+        </a>
+
+           <!-- Button trigger modal -->
+           <a type="button" data-bs-toggle="modal" data-bs-target="#changepassword">
+            <button class="btn btn-outline-danger"> Change Password </button>
+          </a>
+
+        <!--Edit Modal profile password edit -->
+        <div class="modal fade" id="changepassword" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="" id="exampleModalLabel">User password change</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form id="myForm"  action="{% url 'password_edit' %}" enctype="multipart/form-data" method="POST">
+                  {% csrf_token %}
+                  <div style="display: none;" class="alert alert-danger text-center changepassmessage" id="message" role="alert">
+                    
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input name='old_password'   type="password" id="form3Example3cg" class="form-control form-control-lg" />
+                    <label class="form-label" for="form3Example3cg">old password</label>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input name='new_password'   type="password" id="form3Example3cg" class="form-control form-control-lg" />
+                    <label class="form-label" for="form3Example3cg">new password</label>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input name='confirm_new_password'   type="password" id="form3Example3cg" class="form-control form-control-lg" />
+                    <label class="form-label" for="form3Example3cg">confirm new password</label>
+                  </div>
+  
+                  <div class="d-flex justify-content-center">
+                    <button type="submit" onclick="submitForm(event)"
+                      class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                  </div>
+  
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+       <!--Edit Profile Modal -->
+       <div class="modal fade" id="editprofile" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title fs-5" id="exampleModalLabel">Edit profile</h4>
+              <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'edit_profile'%}" enctype="multipart/form-data" method="POST">
+                {% csrf_token %}
+
+                <div class="form-outline mb-4">
+                  <input value="{{user.username}}"  name='name'  type="text" id="id_fullname" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Name</label>
+                </div>  
+
+                <div class="form-outline mb-4">
+                  <input readonly  name='email' value="{{user.email}}" type="" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Email</label>
+                </div>
+
+                <div class="form-outline mb-4">
+                  <input  minlength="10" value="{{user.phone}}" name='phone' type="text" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Mobile Number</label>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button type="submit"
+                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                </div>
+              </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+     {% if address %}
+    <h4 class="pt-5 pb-2">Your addresses</h4>
+    {% endif %}
+
+      {% for a in address  %}
+        {% if not a.id == default.default.id %}
+          <div class="card border rounded  mb-3">
+            <div class="card-body">
+              <h5 class="card-title">{{a.house_name}}, {{a.pincode}}</h5>
+              <p class="card-text">{{a.city}}, near {{a.landmark}}, </p>
+              <div>
+                <!-- Button trigger modal -->
+                  <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#address{{forloop.counter}}">
+                    View
+                  </button>
+
+                  <!-- Modal -->
+                  <div class="modal fade" id="address{{forloop.counter}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title fs-6" id="staticBackdropLabel">View address</h4>
+                          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">Full Name</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.fullname}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">House Name</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.house_name}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">Contact Number</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.contact_number}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">City</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.city}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">Landmark</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.landmark}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">Pincode</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.pincode}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">District</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.district}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">State</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.state}}
+                            </div>
+                          </div>
+                          <hr>
+
+                          <div class="row">
+                            <div class="col-sm-5">
+                              <p class="mb-0">Country</p>
+                            </div>
+                            <div class="col-sm-7">
+                                {{ a.country}}
+                            </div>
+                          </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <a class="btn btn-outline-dark" href="{% url 'edit_address' a.id  %}">
+                  Edit
+                </a>
+                
+                <a  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deletaddress{{forloop.counter}}">
+                  delete
+                </a>
+    
+                <!--Delete Modal -->
+                <div class="modal fade" id="deletaddress{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="" id="exampleModalLabel">Delete</h5>
+                        <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close"> <i class="fa fa-times" ></i></button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure to delete Address <span class="text-primary">" {{a.house_name}} ..."</span></p>
+                        <form action="{% url 'delete_address' a.id %}" enctype="multipart/form-data" method="POST">
+                          {% csrf_token %}
+                          <div class="d-flex justify-content-center">
+                            <button type="submit"
+                              class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Confirm</button>
+                          </div>
+          
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% comment %} <a href="" class="btn btn-dark">Make it default</a> {% endcomment %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <a href="{% url 'add_address' %}">
+        <button class="btn btn-outline-danger">Add new address</button>
+      </a> 
+
+      <br>
+      <br>
+
+    </div>
+  </section>
+
+  <script>
+
+      const myTextField = document.getElementById("id_fullname");
+      myTextField.addEventListener("keypress", function(event) {
+        const key = event.key;
+        const isLetterOrSpace = /[a-zA-Z\s]/.test(key);
+        if (!isLetterOrSpace) {
+          event.preventDefault();
+        }
+      });
+
+      myTextField.addEventListener("paste", function(event) {
+        const pastedText = event.clipboardData.getData('text/plain');
+        const hasNumber = /\d/.test(pastedText);
+        if (hasNumber) {
+          event.preventDefault();
+        }
+      });
+
+
+
+    setTimeout(function(){
+            $('#message').fadeOut('slow')
+        }, 2000)
+
+        function submitForm(event) {
+    event.preventDefault(); // prevent form from submitting
+
+    var inputs = document.forms["myForm"].getElementsByTagName("input");
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].value == "") {
+        alert("Please fill in all fields");
+        return false;
+      }
+    }
+
+    var oldpass = document.getElementsByName('old_password')[0].value
+    var newpass = document.getElementsByName('new_password')[0].value
+    var confpass = document.getElementsByName('confirm_new_password')[0].value
+
+    console.log(oldpass, newpass, confpass)
+
+    $.ajax({
+
+    type: 'POST',
+    url: '{% url "password_edit" %}',
+    data: {
+      'old_password':oldpass,
+      'new_password':newpass,
+      'confirm_new_password':confpass,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action: 'post'
+
+    },
+
+    success: function(json){
+
+      if (json.status == 'true'){
+        window.location.reload()
+        return;
+      }
+
+      var messdiv = document.getElementById('message')
+      messdiv.style.display = "block";
+      messdiv.textContent = json.message
+
+    },
+
+    error: function(xhr, errmsg, err){
+
+
+    }
+
+    });
+
+    // All fields have values, submit the form
+  }
+  </script>
+{% endblock body %} 

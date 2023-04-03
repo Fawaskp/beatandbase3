@@ -1,0 +1,269 @@
+{% extends 'user_home/base.html' %}
+{% load static %}
+{% load mathfilters %}
+
+{% block title %}
+Your cart
+{% endblock title %}
+
+{% block body %}
+
+    <!-- Cart Start -->
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-lg-8 table-responsive mb-5">
+                <table class="table table-bordered text-center mb-0">
+                    <thead class="bg-secondary text-dark">
+                        <tr>
+                            <th>Products</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                    {% if cart %}
+                    {% else %}
+                        <td colspan="5" class="align-middle">
+                           <h4 class="p-4"><i class="fa fa-times"></i> No items in your cart </h4>
+                        </td>
+                    {% endif %}
+                    {% for item in cart %}
+                        {% with product=item.variant  %}
+                        <tr>
+                            <td class="align-middle">
+                                <a href="">
+                                    <img src="{{product.thumbnail.url   }}" alt="" style="width: 50px;"> {{product.product}}
+                                </a>
+                            </td>
+                            <td class="align-middle">{{product.price}}</td>
+                            <td class="align-middle">
+                                <div class="input-group quantity mx-auto" style="width: 100px;">
+                                    <div class="input-group-btn">
+                                        <button data-price="{{product.price}}" data-index="{{product.id}}" class="btn btn-sm btn-primary btn-minus update-button" >
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <input id="pro_qty{{product.id}}" type="text" class="form-control form-control-sm bg-secondary text-center" value="{{item.qty}}">
+                                    <div class="input-group-btn">
+                                        <button data-price="{{product.price}}" data-index="{{product.id}}" class="btn btn-sm btn-primary btn-plus update-button">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <span id="single_pro_total{{product.id}}"> {{ product.price| mul:item.qty }} </span>
+                            </td>
+                            <td class="align-middle">
+                                <a >
+                                    <button  data-index="{{product.id}}"  class="btn btn-sm btn-primary delete-button"><i class="fa fa-times"></i></button>
+                                </a>
+                            </td>
+
+                        {% endwith %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Subtotal</h6>
+                            <h6 id="total_field" class="font-weight-medium">₹ {{ cart.get_total }}</h6>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                                <h6 class="font-weight-medium">Shipping</h6>
+                            {% if cart %}
+                                <h6 class="font-weight-medium">₹ 100</h6>
+                            {% else %}
+                                <h6 class="font-weight-medium">₹ 0</h6>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between">    
+                            <h6 class="font-weight-medium">GST:</h6>
+                            <h6 id="tax_field" class="font-weight-medium">₹ {{cart.get_total | mul:.05}}</h6>
+                        </div>
+                    </div>
+
+                    <div class="card-footer border-secondary bg-transparent">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5 class="font-weight-bold">Total</h5>
+                            {% with total=cart.get_total %}
+
+                                {% if cart %}
+                                    <h5 id="grand_total" class="font-weight-bold">₹ {{cart.get_gst }}</h5>
+                                {% else %}
+                                    <h6 class="font-weight-medium">₹ 0</h6>
+                                {% endif %}
+
+                            {% endwith %}
+                        </div>
+                        {% if cart %}
+                            <a href="" id="proceed-btn" >
+                                <button type="" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
+                            </a>
+                        {% else %}
+                            <button type="" class="btn btn-block btn-primary disabled my-3 py-3">Proceed To Checkout</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Cart End -->
+    <script>
+
+
+    
+        // Update button
+        $(document).on('click', '.update-button', function(e){
+        
+        e.preventDefault();
+        
+        
+        var price = $(this).data('price')
+        var id = $(this).data('index')
+        
+        
+        var pro_qty = parseInt($('#pro_qty' + id).val())
+        
+        
+        // console.log(price, id, old_qty) (for checking purpose)
+        {% for v in variants  %}
+            if ('{{v.id}}' == id){
+                var existing_quantity = parseInt('{{v.quantity}}')
+        
+                if('{{v.quantity}}' == 0){
+                Swal.fire(
+                    'Sorry!',
+                    'Out of stock',
+                    'error'
+                    )
+                document.getElementById('pro_qty'+ id).value = pro_qty -1
+                return;
+                }
+            else if($('#pro_qty' + id).val() > existing_quantity){
+        
+        
+                Swal.fire(
+                    'Oops!',
+                    'only {{v.quantity}} left',
+                    'warning'
+                    )
+        
+                document.getElementById('pro_qty'+ id).value = pro_qty -1
+                return;
+                }
+            }
+        {% endfor %}
+        
+        
+        $.ajax({
+        
+            type: 'POST',
+            url: '{% url "cart-update" %}',
+            data: {
+        
+                variant_id: $(this).data('index'),
+                product_quantity: pro_qty,
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post'
+            },
+        
+            success: function(json){
+        
+                console.log(json)
+                
+                document.getElementById("cart-qty").textContent = json.qty
+        
+        
+                document.getElementById("single_pro_total"+id).textContent =  pro_qty * price
+        
+                document.getElementById("total_field").textContent = '₹ ' + json.total
+        
+                gst = (json.total * .05).toFixed(2)
+        
+                document.getElementById("tax_field").textContent = '₹ ' + gst
+        
+                grand =  parseInt(json.total) + (json.total * .05) +100 
+        
+                document.getElementById("grand_total").textContent = '₹ ' + String(grand.toFixed(2))
+        
+            },
+        
+            error: function(xhr, errmsg, err){
+        
+                
+            }
+        
+        });
+        
+        
+        })
+        
+        
+                
+        $(document).on('click', '.delete-button', function(e){
+                    
+        e.preventDefault();
+        
+        $.ajax({
+        
+            type: 'POST',
+            url: '{% url "cart-delete" %}',
+            data: {
+        
+                variant_id: $(this).data('index'),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post'
+        
+            },
+        
+            success: function(json){
+        
+                //console.log(json)
+        
+                location.reload();
+                
+        
+                document.getElementById("cart-qty").textContent = json.qty
+        
+                document.getElementById("total").textContent = json.total
+        
+            },
+        
+            error: function(xhr, errmsg, err){
+        
+            }
+        
+        });
+        
+        
+        })
+        
+        
+        $(document).on('click', '#proceed-btn', function(e){
+            
+            e.preventDefault();
+            
+            Swal.fire(
+                    'Alert!',
+                    'Login first',
+                    'warning'
+                    )
+        
+        })
+        
+        </script>
+
+
+
+
+    {% endblock body %}

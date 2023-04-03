@@ -1,0 +1,415 @@
+{% extends 'user_home/base.html' %}
+{% load static %}
+{% load mathfilters %}
+
+{% block title %}
+Your cart
+{% endblock title %}
+
+{% block body %}
+
+    <!-- Cart Start -->
+    <div class="container-fluid pt-5">
+        {% if cart %}
+        <div class="row px-xl-5">
+            <div class="col-lg-8 table-responsive mb-5">
+                {% for m in messages  %}
+                {{m}}
+                {% endfor %}
+                <table class="table table-bordered text-center mb-0">
+                    <thead class="bg-secondary text-dark">
+                        <tr>
+                            <th>Products</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                    {% if cart %}
+                    
+                    {% for item in cart %}
+                        {% with product=item.variant  %}
+                        <tr>
+                            <td class="align-middle">
+                                <a href="{% url 'variant_detail' product.id   %}">
+                                    <img src="{{product.thumbnail.url}}" alt="" style="width: 50px;"> {{product.product}}({{product.color}})
+                                </a>
+                            </td>
+                            <td class="align-middle">{{item.variant.price}}</td>
+                            <td class="align-middle">
+
+                                {% if item.variant.quantity > 0 %}
+                                <div class="input-group quantity mx-auto" style="width: 100px;">
+                                    <div class="input-group-btn">
+                                        <button data-price="{{item.variant.price}}" data-index="{{item.variant.id}}" class="btn btn-sm btn-primary btn-minus update-button" >
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    {% if item.variant.quantity < item.qty %}
+                                    <input readonly id="pro_qty{{product.id}}" type="text" class="form-control form-control-sm bg-secondary text-center" value="{{item.variant.quantity}}">
+                                    {% else %}
+                                    <input readonly id="pro_qty{{product.id}}" type="text" class="form-control form-control-sm bg-secondary text-center" value="{{item.qty}}">
+                                    {% endif %}
+                                    <div class="input-group-btn">
+                                        <button  data-price="{{item.variant.price}}" data-index="{{product.id}}" class="btn btn-sm btn-primary btn-plus update-button">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="text-center text-primary">Out of stock</p>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <span id="single_pro_total{{product.id}}"> {{ item.variant.price| mul:item.qty }} </span>
+                            </td>
+                            <td class="align-middle">
+                                <a >
+                                    <button  data-index="{{product.id}}"  class="btn btn-sm btn-primary delete-button"><i class="fa fa-times"></i></button>
+                                </a>
+                            </td>
+                       
+                        {% endwith %}
+                    {% endfor %}
+                    {% else %}
+                        <td colspan="5" class="align-middle">
+                           <div>
+                            <img src="{% static 'user_home/images/empty cart.png' %}" alt="">
+                           </div>
+                        </td>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Subtotal</h6>
+                            <h6 id="total_field" class="font-weight-medium">₹ {{ sub_total }}</h6>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3 pt-1"
+                        id="discount_price_div"
+                        {% if not coupon_cart.coupon %}
+                        style="display: none!important;"
+                        {% endif %}
+                        >
+                            <h6 class="font-weight-medium">Coupon</h6>
+                            <h6 id="discount_price_show" class="font-weight-medium">- ₹{{coupon_cart.coupon_discount}}</h6>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Shipping</h6>
+                            {% if cart %}
+                            <h6 class="font-weight-medium">₹ 100</h6>
+                            {% else %}
+                            <h6 class="font-weight-medium">₹ 0</h6>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">    
+                            <h6 class="font-weight-medium">GST:</h6>
+                            <h6 id="tax_field" class="font-weight-medium">₹ {{gst|floatformat:2}}</h6>
+                        </div>
+                    </div>
+                    <div class="card-footer border-secondary bg-transparent">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5 class="font-weight-bold">Total</h5>
+                            <!-- {% with total=cart.get_total %} -->
+
+                                {% if cart %}
+                                    <h5 id="grand_total" class="font-weight-bold">₹ {{grand_total|floatformat:2}}</h5>
+                                {% else %}
+                                    <h6 class="font-weight-medium">₹ 0</h6>
+                                {% endif %}
+                            
+                            <!-- {% endwith %} -->
+                        </div>
+                        <a href="{% url 'cart_checkout' %}" >
+                            <button id="proceed-btn" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <h3 class="w-100 text-center">Your Cart</h3>
+        <div class="container text-center">
+            <img src="{% static 'user_home/images/empty cart.png' %}" alt="">
+        </div>
+        {% endif %}
+    </div>
+    <!-- Cart End -->
+    <script>
+
+
+    
+// Update button
+$(document).on('click', '.update-button', function(e){
+
+e.preventDefault();
+
+
+var price = $(this).data('price')
+var id = $(this).data('index')
+
+
+var pro_qty = parseInt($('#pro_qty' + id).val())
+
+
+// console.log(price, id, old_qty) (for checking purpose)
+{% for v in variants  %}
+    if ('{{v.id}}' == id){
+        var existing_quantity = parseInt('{{v.quantity}}')
+
+        if('{{v.quantity}}' == 0){
+        Swal.fire(
+            'Sorry!',
+            'Out of stock',
+            'error'
+            )
+        document.getElementById('pro_qty'+ id).value = pro_qty -1
+        return;
+        }
+    else if($('#pro_qty' + id).val() > existing_quantity){
+
+
+        Swal.fire(
+            'Oops!',
+            'only {{v.quantity}} left',
+            'warning'
+            )
+
+        document.getElementById('pro_qty'+ id).value = pro_qty -1
+        return;
+        }
+    }
+{% endfor %}
+
+
+$.ajax({
+
+    type: 'POST',
+    url: '{% url "cart-update" %}',
+    data: {
+
+        variant_id: $(this).data('index'),
+        product_quantity: pro_qty,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action: 'post'
+    },
+
+    success: function(json){
+
+        console.log(json)
+        
+        document.getElementById("cart-qty").textContent = json.qty
+
+
+        document.getElementById("single_pro_total"+id).textContent =  pro_qty * price
+
+        document.getElementById("total_field").textContent = '₹ ' + json.total
+
+        gst = (json.total * .05).toFixed(2)
+
+        document.getElementById("tax_field").textContent = '₹ ' + gst
+
+        grand =  parseInt(json.total) + (json.total * .05) +100 
+
+        document.getElementById("grand_total").textContent = '₹ ' + String(grand.toFixed(2))
+
+    },
+
+    error: function(xhr, errmsg, err){
+
+        
+    }
+
+});
+
+
+})
+
+
+        
+$(document).on('click', '.delete-button', function(e){
+            
+e.preventDefault();
+
+$.ajax({
+
+    type: 'POST',
+    url: '{% url "cart-delete" %}',
+    data: {
+
+        variant_id: $(this).data('index'),
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action: 'post'
+
+    },
+
+    success: function(json){
+
+        //console.log(json)
+
+        location.reload();
+        
+
+        document.getElementById("cart-qty").textContent = json.qty
+
+        document.getElementById("total").textContent = json.total
+
+    },
+
+    error: function(xhr, errmsg, err){
+
+    }
+
+});
+
+
+})
+
+
+
+{% if coupon_cart.coupon %}
+
+$(document).ready(function(){
+                
+    var total = '{{ sub_total }}'
+
+    
+    if (total < 30000){
+        remove_coupon()
+    }
+
+})
+
+{% endif %}
+
+
+
+
+function remove_coupon(){
+      
+    $.ajax({
+
+    type: 'POST',
+    url: "{% url 'remove-coupon' %}",
+    data: {
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action: 'post'
+    },
+
+    success: function(response) {
+        console.log(response);
+        if (response.status == false){
+            document.getElementById('coupon-alert').style.display = 'flex'
+            document.getElementById('coupon-alert').textContent = response.message+' (RELOAD PAGE)'
+            setTimeout(function(){
+                $('#coupon-alert').fadeOut('slow')
+            }, 5000)
+            return;
+        }
+        
+        document.getElementById('remove_coupon_div').style.display = 'None'
+        document.getElementById('couponform').style.display = 'Block'
+
+        document.getElementById('discount_price_div').style.cssText = 'display:none !important';
+
+        document.getElementById('tax_field').innerHTML = '₹ '+ (response.gst).toFixed(2)
+        document.getElementById('grand_total').innerHTML = '₹ '+ (response.total).toFixed(2)
+
+        document.getElementById('coupon-alert').style.display = 'flex'
+        document.getElementById('coupon-alert').textContent = response.message
+        setTimeout(function(){
+            $('#coupon-alert').fadeOut('slow')
+        }, 5000)
+        return;
+    },
+
+    error: function(xhr, status, error) {
+        console.log(error);
+    }
+    }); 
+}
+
+
+
+       
+
+$('#couponform').submit(function(event) {
+
+    event.preventDefault();
+
+    $.ajax({
+
+    type: 'POST',
+    url: "{% url 'add-coupon' %}",
+    data: {
+        couponcode:$('#couponcode').val(),
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action: 'post'
+    },
+
+    success: function(response) {
+
+        console.log(response);
+
+        if (response.status == false){
+            document.getElementById('coupon-alert').style.display = 'flex'
+            document.getElementById('coupon-alert').textContent = response.message
+            setTimeout(function(){
+                $('#coupon-alert').fadeOut('slow')
+            }, 5000)
+            return;
+        }
+
+        document.getElementById('couponform').style.display = 'None'
+        var inputElement = document.getElementById("remove_coupon_div").getElementsByTagName("input")[0];
+        inputElement.placeholder = response.couponcode   
+        document.getElementById('remove_coupon_div').style.display = 'flex'
+
+        document.getElementById('discount_price_div').style.display = 'flex'
+        document.getElementById('discount_price_show').innerHTML = '-₹'+response.discount    
+
+        grand_total = response.grand_total
+        grand_total = grand_total - response.discount
+        gst = grand_total * 0.05
+        grand_total = grand_total + gst + 100
+
+        document.getElementById('tax_field').innerHTML = '₹ '+(gst).toFixed(2)
+        document.getElementById('grand_total').innerHTML = '₹ '+(grand_total).toFixed(2)
+
+        document.getElementById('coupon-alert').style.display = 'flex'
+        document.getElementById('coupon-alert').textContent = response.message
+        setTimeout(function(){
+            $('#coupon-alert').fadeOut('slow')
+        }, 5000)
+        return;
+    },
+
+        error: function(xhr, status, error) {
+        console.log(error);
+        }
+    }); 
+});
+
+$(document).on('click', '#proceed-btn', function(e){
+    
+    e.preventDefault();
+
+    window.location.href = "{% url 'cart_checkout' %}";
+
+})
+
+</script>
+
+{% endblock %}

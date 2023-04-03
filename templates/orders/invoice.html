@@ -1,0 +1,159 @@
+{% extends 'user_home/base.html' %} 
+{% load static %} 
+{% load mathfilters %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'user_products/css/orde_successful.css' %}">
+{% endblock links %}
+
+{% block title %}Ordered Successfully{% endblock %} 
+
+{% block body %}
+
+<div class="card d-flex justify-content-center px-5 p-2">
+
+      <div class="w-100 d-flex justify-content-center">
+
+          <a href="{% url 'user_products' %}" >
+          <button type="" class="btn btn-block btn-primary my-3 py-3">Continue Shopping</button>
+        </a>
+
+        <a class="px-2" href="{% url 'user_orders' %}" >
+          <button type="" class="btn btn-block btn-primary my-3 py-3">Track Your order</button>
+        </a>
+
+      </div>
+
+    <div class="card-body px-3" style="object-fit: contain;">
+  
+      <div class="container w-75 border" style="height: 1122.51px;" >
+        <div class="row">
+          <div class="col-xl-12">
+            <div class="logo-img overflow-hidden">
+                <img class="w-100" src="{% static 'user_home/images/icon.png' %}" alt="">
+            </div>
+          </div>
+        </div>
+  
+  
+        <div class="row">
+          <div class="col-xl-6">
+            <h4 class="position-absolute mb-3" style="left: 10px;">Billing Address</h4><br>
+            <div class="d-flex pt-3 justify-content-start">
+            <ul class="list-unstyled w-50 float-end">
+              <li class="pb-2">{{shipping_address.fullname}}</li>
+              <li class="pb-2">{{shipping_address.house_name}}, {{shipping_address.landmark}}</li>
+              <li  class="pb-2">{{shipping_address.contact_number}}</li>
+              <li>{{shipping_address.user}}</li>
+            </ul>
+          </div>
+        </div>
+
+
+          <div class="col-xl-6">
+          <h4 class="position-absolute mb-4" style="right: 100px;"> Seller Address</h4><br>
+
+            <div class="d-flex pt-3 justify-content-end">
+              <ul class="list-unstyled w-50 float-end">
+                <li class="pb-2">Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016</li>
+                <li  class="pb-2">+91 345 67890</li>
+                <li>beatandbase@gmail.com</li>
+              </ul>
+            </div>
+           </div>
+        </div>
+  
+        <div class="text-center">
+          <h3 class="text-uppercase text-center mt-3" style="font-size: 40px;">Invoice</h3>
+          <p>
+            {{order.order_id}}
+          </p>
+        </div>  
+  
+        <div class="row mx-3">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Description</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in items %}
+              <tr>
+                <td class="w-50" >{{item.variant}}</td>
+                <td class="w-50" >{{item.quantity}}</td>
+                <td class="w-50" >₹ {{item.variant.price}}</td>
+              </tr>
+              {% endfor %}
+            
+                <!-- <tr>
+                <td class="w-50" >Total Amount: </td>
+                <td class="w-50" >₹ {{order.total}}</td>
+                </tr> -->
+                <!-- <tr>
+                <td>Discount:</td> -->
+                <!-- <td><i class="fas fa-dollar-sign"></i> 500,00</td> -->
+                <!-- </tr> -->
+                <!-- <tr>
+                <td class="w-50" >Shippment: </td>
+                <td class="w-50" >₹ 100</td>
+                </tr> -->
+             
+            </tbody>
+          </table>
+  
+        </div>
+        <div class="row justify-content-end ms-5 p-2">
+            <div class="col-xl-8 d-flex  justify-content-end">
+                <table>
+                    <tr>
+                    <td>Total Amount: </td>
+                    <td>&nbsp;₹ {{sub_total}}</td>
+                    </tr>
+                    <tr>
+                    <td>GST:</td>
+                    <td>&nbsp;₹ {{sub_total|mul:0.05}}</td>
+                    </tr>
+                    <tr>
+                    <td>Shippment: </td>
+                    <td>&nbsp;₹ 100</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+          
+        <hr>
+          <div class="d-flex justify-content-end" style="margin-left:60px">
+            <p class="float-end"
+              style="font-size: 30px; color: #d93636; font-weight: 400;font-family: Arial, Helvetica, sans-serif;">
+              Total:
+              <span>₹ {{order.total}}</span></p>
+          </div>
+  
+  
+        <div class="mt-2 mb-5 position-absolute bottom-0" style="bottom: 50px; margin-left: 50px;">
+          <p class="fw-bold">Date: <span class="text-muted">23 June 2023</span></p>
+          <p class="fw-bold mt-3">Signature: &nbsp; &nbsp;
+            <span>
+                <img style="width: 20px;" src="{% static 'user_home/images/green_tick.png' %}" alt="">
+              </span>
+          </p>
+          
+        </div>
+  
+      </div>  
+  
+    </div>
+  </div>
+
+  <script>
+
+function printInvoice() {
+  window.print();
+}
+
+  </script>
+
+{% endblock body %}

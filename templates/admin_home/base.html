@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>{% block title %}{% endblock title %}</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+  {% block links %}
+  {% endblock links %}
+  <!-- Favicons -->
+  <link href="{% static 'user_home/images/logo.png' %}" rel="icon">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  {% comment %} <script src="{% static 'admin_products/js/admin_products.js' %}"></script> {% endcomment %}
+
+  <!-- Add the following to your <head> tag -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.0/dropzone.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.0/min/dropzone.min.js"></script>
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'admin_home/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'admin_home/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'admin_home/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'admin_home/vendor/quill/quill.snow.css' %}" rel="stylesheet">
+  <link href="{% static 'admin_home/vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+  <link href="{% static 'admin_home/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+  <link href="{% static 'admin_home/vendor/simple-datatables/style.css' %}" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Template Main CSS File -->
+  <link href="{% static 'admin_home/css/style.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  <!-- =======================================================
+  * Template Name: NiceAdmin - v2.5.0
+  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="" class="logo d-flex align-items-center">
+        <img src="{% static 'admin_home/images/icon.png' %}" alt="">
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <div class="search-bar">
+     {% block searchbar %}
+     
+     {% endblock searchbar %}
+    </div><!-- End Search Bar -->
+
+    <nav class="header-nav ms-auto">
+          <a class="nav-link nav-profile d-flex align-items-center pe-3" href="#" data-bs-toggle="dropdown">
+        {% comment %} <img src="{{request.user.user_img}}" alt="Profile" class="rounded-circle"> {% endcomment %}
+            <span class="d-none d-md-block dropdown-toggle ps-2">
+              {{request.user.username}}
+            </span>
+          </a><!-- End Profile Iamge Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{request.user.username}}</h6>
+              <span>{{request.user}}</span>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            {% comment %} <li> (admin profile)
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'admin_profile' %}">
+                <i class="bi bi-person"></i>
+                <span>Admin Profile</span>
+              </a>
+            </li> {% endcomment %}
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'admin_logout' %}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar pt-5">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_home' %}">
+          <i class="bi bi-bar-chart-fill"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_sales' %}">
+          <i class="bi bi-clipboard2-data"></i>
+          <span>Sales report</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_products' %}">
+          <i class="bi bi-box"></i>
+          <span>Products</span>
+        </a>
+      </li><!-- End Products Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_brand' %}">
+          <i class="bi bi-building-fill"></i>
+          <span>Brands</span>
+        </a>
+      </li><!-- End Brands Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_category' %}">
+          <i class="bi bi-grid"></i>
+          <span>Categories</span>
+        </a>
+      </li><!-- End Categories Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'product_variants' %}">
+          <i class="bi bi-box-fill"></i>
+          <span>Product Variants</span>
+        </a>
+      </li><!-- End Variants Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'user_list' %}">
+          <i class="bi bi-people"></i>
+          <span>Users</span>
+        </a>
+      </li><!-- End Users Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_orders' %}">
+          <i class="bi bi-cart3"></i>
+          <span>Oders</span>
+        </a>
+      </li><!-- End Oders Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_coupon' %}">
+          <i class="bi bi-bookmark-star-fill"></i>
+          <span>Coupons</span>
+        </a>
+      </li><!-- End Offers Nav -->
+
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'admin_review' %}">
+          <i class="bi bi-star-half"></i>
+          <span>Reviews</span>
+        </a>
+      </li><!-- End Review Nav -->
+
+
+      <li class="nav-item ">
+        <a class="nav-link" href="{% url 'ad_banner' %}">
+          <i class="bi bi-badge-ad-fill"></i>
+          <span>Advertisements</span>
+        </a>
+      </li><!-- End Advertisements Nav -->
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main">
+    {% block body %}
+    
+    
+    {% endblock body %}
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="" class=" ">
+    <div class="opacity-0" style="height: 80px;">
+
+    </div>
+  </footer><!-- End Footer -->
+  <footer id="footer" class="footer  bg-light fixed-bottom">
+    <div class="copyright">
+      &copy; Copyright <strong><span>beatandbase</span></strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+      <!-- All the links in the footer should remain intact. -->
+      <!-- You can delete the links only if you purchased the pro version. -->
+      <!-- Licensing information: https://bootstrapmade.com/license/ -->
+      <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'admin_home/js/main.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/apexcharts/apexcharts.min.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/chart.js/chart.umd.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/echarts/echarts.min.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/quill/quill.min.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/simple-datatables/simple-datatables.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/tinymce/tinymce.min.js' %}"></script>
+  <script src="{% static 'admin_home/vendor/php-email-form/validate.js' %}"></script>
+
+  {% block scripts %}
+  
+  {% endblock scripts %}
+
+</body>
+
+</html>

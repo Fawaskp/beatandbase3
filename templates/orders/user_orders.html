@@ -1,0 +1,478 @@
+{% extends 'user_home/base.html' %} 
+{% load static %} 
+{% load mathfilters %}
+
+{% block title %}Orders {% endblock %} 
+
+{% block body %}
+<style>
+  .text-grey{
+    color: #707070;
+  }
+</style>
+<h3 class="text-center">Your orders</h3>
+<section style="background-color: #ececec;">
+  <div class="container py-5">
+
+    {% if orders %}
+    {% for order in orders  %}
+    <div style="background-color: #dedede; align-items: center!important;" class="border rounded  mb-2 d-flex text-center align-items-center  justify-content-between px-0 py-3">
+     <div class="w-50">
+      <h6 class="w-100 text-center text-grey p-2 m-0">
+        {{order.order_id}} ({{order.payment_method}})
+      </h6>
+     </div>
+      <div class="d-flex align-items-center justify-content-center w-50">
+        <sub class="text-grey">Total &nbsp;</sub>
+            <h5 class="mb-1 me-1 text-grey m-0">₹ {{order.total}}</h5>
+      </div>
+      <div class="d-flex align-items-center justify-content-center w-50">
+        <form action="{% url 'invoice' %}" method="get">
+          <input type="hidden" name="id" value="{{ order.id }}">
+          <input type="hidden" name="addrs" value="{{order.address.id}}">
+          <button type="submit" class="btn btn-light border rounded">
+              Get invoice
+          </button>
+      </form>
+      </div>
+    </div>
+    {% for item in order_items  %}
+      {% if item.order.id == order.id %}
+      <div class="justify-content-center mb-3">
+        <div class="col-md-12 col-xl-12"> 
+          <div class="card shadow-0 border rounded">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12 col-lg-3 col-xl-3 mb-4 mb-lg-0">
+                  <div class="bg-image hover-zoom ripple rounded ripple-surface">
+                    <img src="{{item.variant.thumbnail.url}}"
+                      class="w-100" />
+                    <a href="#!">
+                      <div class="hover-overlay">
+                        <div class="mask" style="background-color: rgba(253, 253, 253, 0.15);"></div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-6 col-xl-6">
+                  <h5>{{item.variant.product.product_name}}</h5>
+                  <br>
+                  <h6>Color : {{item.variant.color}}</h6>
+                  <h6>Brand : {{item.variant.product.brand}}</h6>
+                  <h6>Category : {{item.variant.product.category}}</h6>
+
+                </div>
+                <div class="col-md-6 col-lg-3 col-xl-3 border-sm-start-none border-start">
+                  <div class="d-flex flex-row align-items-center mb-1">
+                    <sub class="text-dark">Total &nbsp;</sub>
+                    {% with item_price=item.variant.price|mul:item.quantity  %}
+                      {% with gst=item_price|mul:0.05  %}
+                        <h4 class="mb-1 me-1">₹ {{item_price|add:gst|add:100|floatformat:2}}</h4>
+                      {% endwith %}
+                    {% endwith %}
+                  </div>
+                  <h6 class="text-muted">{{item.order.placed_at.date}}</h6>
+                  <!-- <h6 class="text-success">Free shipping</h6>  -->
+                  <div class="d-flex flex-column mt-4">
+                  
+                    {% if item.status == 'pending' %}
+                      <span style="background-color: #fff2e1 !important; color: #fdac41 !important; border-radius: 0; font-weight: 500;" class="badge p-2 my-2">{{item.status}}</span>
+                    {% elif item.status == 'processing' %}
+                      <span style="background-color: #fff2e1 !important; color: #fdac41 !important; border-radius: 0; font-weight: 500;" class="badge p-2 my-2">{{item.status}}</span>
+                    {% elif item.status == 'shipped' %}
+                      <span style="background-color: #e5edfc !important; color: #6d99eb !important; border-radius: 0; font-weight: 500;" class="badge p-2 my-2">{{item.status}}</span>
+                    {% elif item.status == 'delivered' %}
+                      <span style="background-color: #dff9ec !important; color: #39da8a !important; border-radius: 0; font-weight: 500;" class="badge p-2 my-2">{{item.status}}</span>
+                    {% elif item.status == 'cancelled' or 'refunded' %}
+                      <span style="background-color: #ffe4e4 !important; color: #e85a5a !important; border-radius: 0; font-weight: 500;" class="badge p-2 my-2">{{item.status}}</span>
+                    {% endif %}
+
+                    {% if item.status == 'delivered' %}
+                    <button type="button" class="btn btn-primary"  data-bs-toggle="modal" data-bs-target="#trackorder{{forloop.counter}}">
+                      <i class="fas fa-detail me-2"></i>View Order
+                    </button>
+                    {% else %}
+                    <button type="button" class="btn btn-primary "  data-bs-toggle="modal" data-bs-target="#trackorder{{forloop.counter}}">
+                      <i class="fas fa-detail me-2"></i>Track Your order
+                    </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="modal fade" id="trackorder{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content ">
+            <div class="d-flex justify-content-end">
+              <button onclick="location.reload()" type="button" class="btn btn-close p-0" data-bs-dismiss="modal" aria-label="Close">
+                <i style="font-size: 25px;" class="fa fa-times p-2"></i>
+              </button>
+            </div>
+            <div class="container-fluid my-5 d-sm-flex justify-content-center">
+              <div class="card px-2" style="box-shadow:  0 0 0 0;">
+                  <div class="card-header bg-white">
+                    <div class="row justify-content-between">
+                      <div class="col">
+                          <p class="text-muted"> Order ID  <span class="font-weight-bold text-dark">{{item.order.order_id}}</span></p> 
+                          <p class="text-muted"> Place On <span class="font-weight-bold text-dark">{{item.order.placed_at.date}}</span> </p></div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                      <div class="media flex-column flex-sm-row">
+                          <div class="media-body ">
+                              <h6 class="bold">{{item.variant}}</h6>
+                              <p class="text-muted"> Qt: {{item.quantity}}</p>
+                              <h4 class="mt-3 mb-4 bold"> <span class="mt-5">&#x20B9;</span> 
+                                {% with item_price=item.variant.price|mul:item.quantity  %}
+                                {% with gst=item_price|mul:0.05  %}
+                                {{item_price|add:gst|add:100|floatformat:2}}
+                                {% endwith %}
+                              {% endwith %}
+                              <br>
+                              <span class="small text-muted"> via ({{item.order.payment_method}}) </span></h4>
+                          </div><img class="align-self-center img-fluid" src="{{item.variant.thumbnail.url}}" width="180 " height="180">
+                      </div>
+                  </div>
+                  <div class="row px-3">
+                    <div class="col">
+
+                          {% if item.status == 'pending' %}
+                            <ul id="progressbar" >
+                                <li class="step0 active " id="step1">PLACED</li>
+                                <li class="step0 text-center" id="step2">SHIPPED</li>
+                                <li class="step0 text-muted text-right" id="step3">DELIVERED</li>
+                            </ul>
+                            {% elif item.status == 'processing' %}
+                            <ul id="progressbar" >
+                                <li class="step0 active " id="step1">PLACED</li>
+                                <li class="step0  text-center" id="step2">SHIPPED</li>
+                                <li class="step0  text-muted text-right" id="step3">DELIVERED</li>
+                            </ul>
+                            {% elif item.status == 'shipped' %}
+                            <ul id="progressbar" >
+                                <li class="step0 active " id="step1">PLACED</li>
+                                <li class="step0 active text-center" id="step2">SHIPPED</li>
+                                <li class="step0  text-muted text-right" id="step3">DELIVERED</li>
+                            </ul>
+                            {% elif item.status == 'delivered' %}
+                            <ul id="progressbar" >
+                                <li class="step0 active " id="step1">PLACED</li>
+                                <li class="step0 active text-center" id="step2">SHIPPED</li>
+                                <li class="step0 active text-muted text-right" id="step3">DELIVERED</li>
+                            </ul>
+                            {% endif %}
+
+                    </div>
+                </div>
+                  {% if  item.status == 'pending' or  item.status == 'processing' or item.status == 'shipped'  %}
+                  <div class="card-footer  bg-white px-sm-3 pt-sm-4 px-0">
+                      <div class="row text-center  ">
+                          <div class="col  my-auto  border-line ">
+                              <button id="order_cancel_btn" onclick="cancel_order('{{item.order.id}}','{{item.id}}')" class="btn btn-outline-primary">Cancel Order</button>
+                              <h5 style="opacity: 0;" id="order_cacelled_text" class="w-100 text-primary text-center">Order Cancelled</h5>
+                            </div>
+                    </div>
+                  </div>
+                  {% elif item.status == 'delivered' %}
+                  <div class="card-footer  bg-white px-sm-3 pt-sm-4 px-0">
+                    <div class="row text-center  ">
+                      <div class="col  my-auto  border-line ">
+                          <button id="order_cancel_btn" onclick="refund_order('{{item.order.id}}','{{item.id}}')" class="btn btn-outline-primary">Refund</button>
+                          <h5 style="opacity: 0;" id="order_cacelled_text" class="w-100 text-primary text-center">Order Refunded</h5>
+                        </div>
+                  </div>
+                </div>
+                  {% elif item.status == 'cancelled' %}
+                  <div class="card-footer  bg-white px-sm-3 pt-sm-4 px-0">
+                    <div class="row text-center  ">
+                        <h5  class="w-100 text-primary text-center">Order Cancelled</h5>
+                  </div>
+                </div>
+                {% elif item.status == 'refunded' %}
+                <div class="card-footer  bg-white px-sm-3 pt-sm-4 px-0">
+                  <div class="row text-center  ">
+                      <h5  class="w-100 text-primary text-center">Order Refunded</h5>
+                </div>
+              </div>
+                 {% endif %}
+              </div>
+            </div>
+        
+          </div>
+        </div>
+        </div>
+  
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+ 
+    <div class="col-12 pb-1">
+      <nav aria-label="Page navigation">
+          {% if orders.has_other_pages %}
+          <ul class="pagination justify-content-center mb-3">
+  
+              {% if orders.has_previous %}
+              <li class="page-item "><a href="?page={{orders.previous_page_number}}"
+                      class="page-link text-dark">Previous</a></li>
+              {% else %}
+              <li class="page-item disabled"><a href="#" class="page-link">Previous</a></li>
+              {% endif %}
+  
+              {% for i in orders.paginator.page_range %}
+              {% if orders.number == i %}
+              <li class="page-item active"><a href="#" class="page-link">{{i}}</a></li>
+              {% else %}
+              <li class="page-item"><a href="?page={{i}}" class="page-link text-dark">{{i}}</a></li>
+              {% endif %}
+              {% endfor %}
+  
+              {% if orders.has_next %}
+              <li class="page-item"><a href="?page={{orders.next_page_number}}"
+                      class="page-link text-dark p-lr-25">Next</a></li>
+              {% else %}
+              <li class="page-item disabled"><a href="#" class="page-link p-lr-25">Next</a></li>
+              {% endif %}
+          </ul>
+
+          {% endif %}
+      </nav>
+  </div>
+
+    {% else %}
+    <h3 class="text-center">No ordered anything yet</h3>
+  {% endif %}
+
+  </div>
+
+</section>
+
+<script>
+  function cancel_order(order,item){
+
+  $.ajax({
+
+    type: 'POST',
+    url: '{% url "cancel-order" %}',
+    data: {
+
+        order: order,
+        item: item,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+        action: 'post'
+
+    },
+
+    success: function(json){
+
+      if (json.status == true){
+        Swal.fire(
+            'Succefull!',
+            'Order cancelled',
+            'success'
+            )
+      }
+
+      document.getElementById('order_cancel_btn').style.display = 'None'
+      document.getElementById('order_cacelled_text').style.opacity = 100
+
+    },
+
+    error: function(xhr, errmsg, err){
+
+    }
+
+  });
+  }
+
+  function refund_order(order,item){
+
+    $.ajax({
+  
+      type: 'POST',
+      url: '{% url "refund-order" %}',
+      data: {
+  
+          order: order,
+          item: item,
+          csrfmiddlewaretoken: "{{csrf_token}}",
+          action: 'post'
+
+      },
+  
+      success: function(json){
+  
+        if (json.status == true){
+          Swal.fire(
+              'Succefull!',
+              'Refund Genrated',
+              'success'
+              )
+        }
+  
+        document.getElementById('order_cancel_btn').style.display = 'None'
+        document.getElementById('order_cacelled_text').style.opacity = 100
+  
+      },
+  
+      error: function(xhr, errmsg, err){
+  
+      }
+  
+    });
+    }
+
+</script>
+       
+
+<style>
+
+p {
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+
+.bold{
+    font-weight: 600;
+}
+
+.small{
+    font-size: 12px !important;
+    letter-spacing: 0.5px !important;
+}
+
+.Today{
+    color: rgb(83, 83, 83);
+}
+
+.btn-outline-primary{
+    background-color: #fff !important;
+    color:#d93636 !important;
+    border:1.3px solid #d93636;
+    font-size: 12px;
+    border-radius: 0.4em !important;
+}
+
+.btn-outline-primary:hover{
+    background-color:#d93636  !important;
+    color:#fff !important;
+    border:1.3px solid #d93636;
+}
+
+ 
+#progressbar {
+  margin-bottom: 30px;
+  overflow: hidden;
+  color: #455A64;
+  padding-left: 0px;
+  margin-top: 30px
+}
+
+#progressbar li {
+  list-style-type: none;
+  font-size: 13px;
+  width: 33.33%;
+  float: left;
+  position: relative;
+  font-weight: 400;
+  color: #004260 !important;
+  
+}
+
+#progressbar #step1:before {
+  content: "1";
+  color: #fff;
+  width: 29px;
+  margin-left: 15px !important;
+  padding-left: 11px !important;
+}
+
+
+#progressbar #step2:before {
+  content: "2";
+  color: #fff;
+  width: 29px;
+
+}
+
+#progressbar #step3:before {
+  content: "3";
+  color: #fff;
+  width: 29px;
+  margin-right: 15px !important;
+  padding-right: 11px !important;
+}
+
+#progressbar li:before {
+  line-height: 29px;
+  display: block;
+  font-size: 12px;
+  background: #646464 ;
+  border-radius: 50%;
+  margin: auto;
+}
+
+#progressbar li:after {
+  content: '';
+  width: 121%;
+  height: 2px;
+  background: #455A64;
+  position: absolute;
+  left: 0%;
+  right: 0%;
+  top: 15px;
+  z-index: -1;
+} 
+
+#progressbar li:nth-child(2):after {
+  left: 50%;
+}
+
+#progressbar li:nth-child(1):after {
+  left: 25%;
+  width: 121%;
+}
+#progressbar li:nth-child(3):after {
+  left: 25% !important;
+  width: 50% !important;
+}
+
+#progressbar li.active:before,
+#progressbar li.active:after {
+  background: #d93636   ; 
+}
+
+
+
+small{
+    font-size: 12px !important;
+}
+
+.a {
+    justify-content: space-between !important;
+}
+
+.border-line {
+    border-right: 1px solid rgb(226, 206, 226)
+}
+
+
+.card {
+    background-color: #fff ;
+    box-shadow: 2px 4px 10px 0px #9292929f;
+    z-index: 0;
+}
+</style>
+
+
+{% endblock body %}
+

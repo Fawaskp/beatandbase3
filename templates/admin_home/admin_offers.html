@@ -1,0 +1,263 @@
+{% extends 'admin_home/base.html' %}
+
+{% block title %}
+Coupons
+{% endblock title %}
+
+
+
+
+{% block body %}
+
+{% for m in messages  %}
+<div id="message" class="alert alert-info" role="alert">
+  {{m}}
+</div>
+{% endfor %}
+
+<div class="pagetitle">
+  <h1>Coupons</h1>
+</div><!-- End Page Title -->
+
+<section class="section dashboard">
+  <div class="row">
+
+    <!-- Left side columns -->
+    <div class="col-lg-12">
+      <div class="row">
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+          <div class="card recent-sales overflow-auto">
+
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filter</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">This Month</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title">Recent Sales <span>| Today</span></h5>
+
+              <table class="table table-borderless datatable">
+                <thead>
+                  <tr>
+                    <th scope="col">#id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Minimum amount</th>
+                    <th scope="col">Discount Percentage</th>
+                    <th scope="col">Maximum Discount</th>
+                    <th scope="col">Expiry date</th>
+                    <th scope="col">Count</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for coupon in coupons  %}
+                  <tr>
+                    <th scope="row">{{coupon.id}}</th>
+                    <td>{{coupon.name}}</td>
+                    <td>₹ {{coupon.min_amount}}</td>
+                    <td>{{coupon.off_percent}}%</td>
+                    <td>-₹ {{coupon.max_discount}}</td>
+                    <td>{{coupon.expiry_date}}</td>
+                    <td>{{coupon.quantity}}</td>
+                    {% if coupon.status %}
+                      <td><span class="badge bg-success">Active</span></td>
+                    {% else %}
+                      <td><span class="badge bg-primary">In-active</span></td>
+                    {% endif %}
+
+                    <td>
+                       <!-- Button trigger modal -->
+                       <a type="button" class="fs-4 text-danger" data-bs-toggle="modal" data-bs-target="#confirmDelete{{forloop.counter}}">
+                        <i title="Delete Product" class="fa fa-trash"></i>
+                      </a>
+
+                      <a type="button" class="fs-4 text-warning px-2" data-bs-toggle="modal" data-bs-target="#editcoupon{{forloop.counter}}">
+                        <i title="Delete Product" class="fa fa-pen"></i>
+                      </a>
+
+                       <!--Edit Modal -->
+                      <div class="modal fade" id="editcoupon{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Coupon</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="{% url 'edit_coupon'%}" enctype="multipart/form-data" method="POST">
+                                {% csrf_token %}
+                                <input name='coupon_id'  type="hidden" value="{{coupon.id}}" id="form3Example3cg" class="form-control form-control-lg" />
+
+                                <div class="form-outline mb-4">
+                                  <input required value="{{coupon.name}}" name='coupon_name'  type="text" id="form3Example3cg" class="form-control form-control-lg" />
+                                  <label class="form-label" for="form3Example3cg">Coupon name</label>
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                  <input required value="{{coupon.min_amount}}" name='min_amount'  type="number" id="form3Example3cg" class="form-control form-control-lg" />
+                                  <label class="form-label" for="form3Example3cg">Minimum Purchase</label>
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                  <input required value="{{coupon.off_percent}}" name='discount_percent'  type="number" id="form3Example3cg" class="form-control form-control-lg" />
+                                  <label class="form-label" for="form3Example3cg">Discount percentage</label>
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                  <input required value="{{coupon.max_discount}}" name='max_discount'  type="text" id="form3Example3cg" class="form-control form-control-lg" />
+                                  <label class="form-label" for="form3Example3cg">Maximum discount</label>
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                  <input required name='count' value="{{coupon.quantity}}"  type="number" id="form3Example3cg" class="form-control form-control-lg" />
+                                  <label class="form-label" for="form3Example3cg">Count</label>
+                                </div>
+
+
+                                <div class="form-check mb-3">
+                                  {% if coupon.status  %}
+                                    <input name="active_status" checked type="checkbox" class="form-check-input" id="exampleCheck1">
+                                  {% else %}
+                                    <input name="active_status" type="checkbox" class="form-check-input" id="exampleCheck1">
+                                  {% endif %}
+                                  <label class="form-check-label" for="exampleCheck1">Active status</label>
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                  <input required name='expire_date' type="date"  class="form-control form-control-lg form3Example3cgfdgfdg2" value="{{coupon.expiry_date|date:'Y-m-d'}}" />
+                                  <label class="form-label" for="form3Example3cg">Expire date</label>
+                                </div>
+
+
+
+                                <div class="d-flex justify-content-center">
+                                  <button type="submit"
+                                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                                </div>
+
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Modal -->
+                      <div class="modal fade" id="confirmDelete{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h2 class="modal-title fs-5" id="exampleModalLabel">Confirm Delete</h2>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <h5>
+                                delete coupon <span class="text-danger">'{{coupon.name}}'</span>
+                              </h5>
+                            </div>
+                            <div class="modal-footer">
+                              <form action="{% url 'delete_coupon' %}" method="POST" >
+                                {% csrf_token %}
+                                <input name='coupon_id'  type="hidden" value="{{coupon.id}}" id="form3Example3cg" class="form-control form-control-lg" />
+                                <button type="submit" class="btn btn-danger">Confirm</button>
+                              </form>
+                              {% comment %} <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> {% endcomment %}
+                          </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+        </div>
+        <a type="button" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#addCoupon">
+          <i title="Add Product" class="fa fa-plus"></i>
+        </a>
+
+       <!--Add Modal -->
+       <div class="modal fade" id="addCoupon" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Add Coupon</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'add_coupon'%}" enctype="multipart/form-data" method="POST">
+                {% csrf_token %}
+
+                <div class="form-outline mb-4">
+                  <input required name='coupon_name'  type="text" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Coupon name</label>
+                </div>
+
+                <div class="form-outline mb-4">
+                  <input required name='min_amount'  type="number" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Minimum Purchase</label>
+                </div>
+
+                <div class="form-outline mb-4">
+                  <input required name='discount_percent'  type="number" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Discount percentage</label>
+                </div>
+
+                <div class="form-outline mb-4">
+                  <input required name='max_discount'  type="text" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Maximum discount</label>
+                </div>
+
+                <div class="form-outline mb-4">
+                  <input required name='count'  type="number" id="form3Example3cg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Count</label>
+                </div>
+
+
+                <div class="form-check mb-3">
+                  <input name="active_status" checked type="checkbox" class="form-check-input" id="exampleCheck1">
+                  <label class="form-check-label" for="exampleCheck1">Active status</label>
+                </div>
+
+
+                <div class="form-outline mb-4">
+                  <input required name='expire_date' type="date" id="form3Example3cgfdgfdg" class="form-control form-control-lg" />
+                  <label class="form-label" for="form3Example3cg">Expire date</label>
+                </div>
+                
+
+                <div class="d-flex justify-content-center">
+                  <button type="submit"
+                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Save Changes</button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+        </div><!-- End Recent Sales -->
+
+      </div>
+    </div><!-- End Left side columns -->
+
+    <script>
+      let today = new Date().toISOString().substr(0, 10);
+      document.querySelector("#form3Example3cgfdgfdg").setAttribute("min", today);
+      document.querySelector(".form3Example3cgfdgfdg2").setAttribute("min", today);
+
+    </script>
+{% endblock body %}

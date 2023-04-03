@@ -1,0 +1,139 @@
+{% extends 'user_home/base.html' %}
+
+{% load static %}
+{% block title %}Your Wishlist{% endblock title %}
+
+{% block body %}
+
+{% for m in messages  %}
+        {{m}}
+{% endfor %}
+
+<div class="container-xl">
+    <h3 class="text-center">Your Wishlist</h3>
+    <br>
+    <br>
+    {% if products %}
+    <table class="table table-borderless">
+        <thead>
+            <tr>
+                <th >Image</th>
+                <th >Product Name</th>
+                <th >Unit Price</th>
+                <th >Stock Status</th>
+                <th ></th>
+                <th ></th>
+            </tr>
+        </thead>
+        <tbody>
+           {% for product in products  %}
+            <tr>
+                <td >
+                    <div class="display-flex align-center">
+                        <div style="width:100px" class="img-product">
+                            <img class="w-100" src="{{product.variant.thumbnail.url}}" alt="" class="mCS_img_loaded">
+                        </div>
+                    </div>
+                </td>
+                <td >
+                    {{product.variant.product}} ({{product.variant.color}})
+                </td>
+                <td  class="price">₹ {{product.variant.price}}</td>
+                <td >
+                    {% if product.variant.quantity < 1 %}
+                    <span class="in-stock-box text-danger">out of stock</span>
+                    {% else %}
+                    <span class="in-stock-box text-info">In stock</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'cart-summary' %}">
+                        <button id="add-cart" data-qty="{{product.variant.quantity}}" value="{{product.variant.id}}" class="btn btn-primary mx-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+                    </a>
+                </td>
+                <td class="text-center">
+
+                    <a  data-bs-toggle="modal" data-bs-target="#Confirm{{forloop.counter}}">
+                        <i class="far fa-trash-alt"></i>
+                      </a>
+          
+                      <!--Confirm Modal -->
+                      <div class="modal fade" id="Confirm{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="" id="exampleModalLabel">Delete item</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="{% url 'delete-wishlist' product.variant.id %}" method="POST">
+                                {% csrf_token %}
+                                <div class="p-3">
+                                    Are you sure to remove <span class="text-primary"> {{product.product}}</span> From wishlist
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                  <button type="submit"
+                                    class="btn btn-danger btn-lg gradient-custom-4 w-50 text-light">Remove</button>
+                                </div>
+                
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <div class="w-100 d-flex justify-content-center p-3 mb-4">
+            <img  src="{% static 'user_home/images/cart-empty.png' %}" alt="">
+        </div>
+    {% endif %}
+</div>
+
+
+<script>
+
+
+    $(document).on('click','#add-cart',function(e){
+
+        e.preventDefault();
+
+        if ($(this).data('qty')<1){
+            Swal.fire(
+            'Sorry!',
+            'Out of stock',
+            'error'
+            )
+            return;
+        }
+        
+
+        $.ajax({
+
+            type:'POST',
+            url:"{% url 'cart-add' %}",
+            data:{
+                product_id:$('#add-cart').val(),
+                product_variant:$(this).val(),
+                product_quantity:1,
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action:'post'
+            },
+
+            success: function(json){
+                window.location.replace("/cart");
+            },
+
+            error: function(xhr, errmshg, err){
+
+            }
+        });
+
+    });
+</script>
+
+{% endblock body %}

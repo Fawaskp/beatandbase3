@@ -1,0 +1,176 @@
+{% extends 'admin_home/base.html' %}
+
+{% block title %}
+User Management
+{% endblock title %}
+
+{% block links %}
+{% endblock links %}
+
+{% block searchbar %}
+<form class="search-form d-flex align-items-center" method="POST" action="{% url 'search-users' %}">
+  {% csrf_token %}
+  <input value="{{search_text}}" type="text" name="query" placeholder="Search Users" title="Enter search keyword">
+  <button type="submit" title="Search Users"><i class="bi bi-search"></i></button>
+  {% if search_text %}
+  <a class="mx-5" href="{% url 'user_list' %}">
+    <button class=" bg-danger text-light p-1 px-2 rounded" type="button" title="Clear">clear</button>
+    </a>
+    {% endif %}
+</form>
+
+{% endblock searchbar %}
+
+{% block body %}
+
+<div class="pagetitle">
+  <h1>Users</h1>
+</div><!-- End Page Title -->
+
+
+<section class="section dashboard">
+  <div class="row">
+
+    <!-- Left side columns -->
+    <div class="col-lg-12">
+      <div class="row">
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+          <div class="card recent-sales overflow-auto">
+
+            <div class="card-body">
+              <table class="table table-borderless">
+                <thead>
+                  <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Mobile number</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Block Status</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in users  %}
+                    <tr>
+                      <th scope="row">{{u.identification}}</th>
+                      <td>{{u.username}}</td>
+                      <td>{{u.email}}</td>
+                      <td>
+                        {% if u.phone %}
+                          {{u.phone}}
+                        {% else %}
+                          <span class="text-danger">not provided</span>
+                        {% endif %}
+                      </td>
+
+                      <td><span class="badge 
+                        {% if u.is_active %}bg-info px-4
+                        {% else %}
+                        bg-dark px-3
+                        {% endif %}">
+                        {% if u.is_active %}Verified 
+                        {% else %}
+                        Not verified
+                        {% endif %}
+                      </span></td>
+                      <td><span class="badge 
+                        {% if not u.is_blocked %}bg-success px-4
+                        {% else %}
+                        bg-danger px-3
+                        {% endif %}">
+                        {% if not u.is_blocked %}Active 
+                        {% else %}
+                        Blocked
+                        {% endif %}
+                      </span></td>
+                      <td>
+                                <!-- Button trigger modal -->
+                                <a data-bs-toggle="modal" data-bs-target="#confirmDelete{{forloop.counter}}" >
+                                  <button class="btn {% if not u.is_blocked %}btn-danger px-4
+                                  {% else %}
+                                  btn-success px-3
+                                  {% endif %}">
+                                  {% if not u.is_blocked %}Block 
+                                  {% else %}
+                                  Unblock
+                                  {% endif %}
+                                </button>
+                                </a>
+          
+                                <!-- Modal -->
+                                <div class="modal fade" id="confirmDelete{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h2 class="modal-title fs-5" id="exampleModalLabel">
+                                          Confirm {% if u.is_active %}Block {% else %}Unblock{% endif %}
+                                        </h2>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <h5>
+                                          {% if u.is_active %}Block {% else %}Unblock
+                                          {% endif %} user <span class="text-danger">'{{u.username}}'</span>
+                                        </h5>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <form action="{% url 'user_action' u.id %}" >
+                                          <button type="submit" class="btn btn-danger">Confirm</button>
+                                        </form>
+                                        {% comment %} <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> {% endcomment %}
+                                    </div>
+                                    </div>
+                                  </div>
+                                </div>
+                        
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+        </div><!-- End Recent Sales -->
+
+        <div class="col-12 pb-1 py-3">
+          <nav aria-label="Page navigation">
+              {% if users.has_other_pages %}
+              <ul class="pagination justify-content-center mb-3">
+  
+                  {% if users.has_previous %}
+                  <li class="page-item "><a href="?page={{users.previous_page_number}}"
+                          class="page-link text-dark">Previous</a></li>
+                  {% else %}
+                  <li class="page-item disabled"><a href="#" class="page-link">Previous</a></li>
+                  {% endif %}
+  
+                  {% for i in users.paginator.page_range %}
+                  {% if users.number == i %}
+                  <li class="page-item active"><a href="#" class="page-link">{{i}}</a></li>
+                  {% else %}
+                  <li class="page-item"><a href="?page={{i}}" class="page-link text-dark">{{i}}</a></li>
+                  {% endif %}
+                  {% endfor %}
+  
+                  {% if users.has_next %}
+                  <li class="page-item"><a href="?page={{users.next_page_number}}"
+                          class="page-link text-dark p-lr-25">Next</a></li>
+                  {% else %}
+                  <li class="page-item disabled"><a href="#" class="page-link p-lr-25">Next</a></li>
+                  {% endif %}
+              </ul>
+  
+              {% endif %}
+          </nav>
+      </div>
+
+      </div>
+    </div><!-- End Left side columns -->
+
+
+
+{% endblock body %}
