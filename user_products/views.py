@@ -148,7 +148,6 @@ def variant_detail(request,variant_id):
     except:
         cart = ''
     else:
-        print('some exception occured while getting cartitem for variant detail')
         cart = CartItem.objects.filter(cart = cartdb)
 
     reveiws = ReviewRating.objects.filter(product = main_variant.product)

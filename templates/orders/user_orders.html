@@ -55,7 +55,7 @@
                   </div>
                 </div>
                 <div class="col-md-6 col-lg-6 col-xl-6">
-                  <h5>{{item.variant.product.product_name}}</h5>
+                  <h5>{{item.variant.product.product_name}} <span class="text-primary">{% if item.quantity > 1 %}x {{item.quantity}}{% endif %}</span></h5> 
                   <br>
                   <h6>Color : {{item.variant.color}}</h6>
                   <h6>Brand : {{item.variant.product.brand}}</h6>
@@ -64,12 +64,13 @@
                 </div>
                 <div class="col-md-6 col-lg-3 col-xl-3 border-sm-start-none border-start">
                   <div class="d-flex flex-row align-items-center mb-1">
-                    <sub class="text-dark">Total &nbsp;</sub>
-                    {% with item_price=item.variant.price|mul:item.quantity  %}
+                    <sub class="text-dark"> &nbsp;</sub>
+                    <!-- {% with item_price=item.variant.price|mul:item.quantity  %}
                       {% with gst=item_price|mul:0.05  %}
                         <h4 class="mb-1 me-1">₹ {{item_price|add:gst|add:100|floatformat:2}}</h4>
                       {% endwith %}
-                    {% endwith %}
+                    {% endwith %} (for future adding) -->
+                    <h5 class="mb-1 me-1" >₹ {{item.variant.price|floatformat:0 }}</h5>
                   </div>
                   <h6 class="text-muted">{{item.order.placed_at.date}}</h6>
                   <!-- <h6 class="text-success">Free shipping</h6>  -->

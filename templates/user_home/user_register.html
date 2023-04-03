@@ -96,10 +96,20 @@
                     </div>
 
                     <div class="form-outline mb-3">
-                      <input name='mobile' value="{{pre_mobile}}" type="text" id="form3Example3cg" class="form-control form-control-lg" />
-                      <label class="form-label" for="form3Example3cg">Mobile Number</label>
+                      <input  name='mobile' value="{{pre_mobile}}" type="text" id="mobile-field" class="form-control form-control-lg" />
+                      <label class="form-label" for="mobile-field">Mobile Number</label>
                     </div>
-    
+
+                    <script>
+                      const mobileInput = document.getElementById('mobile-field');
+                      mobileInput.addEventListener('input', function(e) {
+                        const value = e.target.value;
+                        if (value.charAt(0) === '0') {
+                          e.target.value = value.slice(1);
+                        }
+                      });
+                      </script>
+
                     <div class="form-outline mb-3">
                       <input name='pass1' value="{{pre_password1}}" type="password" id="form3Example4cg" class="form-control form-control-lg password-strength-meter" />
                       <label class="form-label" for="form3Example4cg">Password</label>

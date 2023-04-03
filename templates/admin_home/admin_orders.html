@@ -48,6 +48,7 @@ Orders
                     <th scope="col">Customer</th>
                     <th scope="col">Address</th>
                     <th scope="col">Total</th>
+                    <th scope="col">Method</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -60,9 +61,8 @@ Orders
                     <td>{{order.customer.username}}
                       <br>{{order.address}}
                     </td>
-                    <td>
-                      {{order.total}}
-                    </td>
+                    <td>{{order.total}}</td>
+                    <td>{{order.payment_method}}</td>
                     <td>
                       <a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#vieworder{{forloop.counter}}">
                        view order
@@ -94,7 +94,7 @@ Orders
                               </div>
 
                               <div class="col-md-3 col-lg-3 col-xl-3">
-                                <h5>{{item.variant.product.product_name}}</h5>
+                                <h5>{{item.variant.product.product_name}} <span style="font-weight: 900;" class="text-danger">x {{item.quantity}}</span></h5>
                                 
                               {% if item.status == 'pending' %}
                                 <span style="background-color: #fff2e1 !important; color: #fdac41 !important; border-radius: 0; font-weight: 500;" class="badge p-2 my-2 fs-6">{{item.status}}</span>
@@ -116,11 +116,7 @@ Orders
 
                               
                               <div class="col-md-3 col-lg-3 col-xl-3">
-                                <p>{{item.order.address.full_name}}</p>
-                                <p>{{item.order.address.contact_number}}</p>
-                                <p>{{item.order.address}}</p>
-                                <p>{{item.order.address}}</p>
-                                <p>{{item.order.address}}</p>
+ 
                               </div>
 
                               

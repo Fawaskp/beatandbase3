@@ -102,7 +102,7 @@ DATABASES = {
         'USER': config('db_user'),
         'PASSWORD': config('db_pass'),
         'HOST': config('db_host'),
-        'PORT':5432,
+        'PORT':config('db_port', cast=int),
     }
 }
 
@@ -161,11 +161,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Email settings
 LOGIN_URL='user_login'
 LOGIN_REDIRECT_URL='home'
-EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT=587
-EMAIL_HOST_USER= 'beatandbase01@gmail.com'
-EMAIL_HOST_PASSWORD=  'xyotamxedmokwaud'
+
+EMAIL_BACKEND=config('EMAIL_BACKEND')
+EMAIL_HOST=config('EMAIL_HOST')
+EMAIL_PORT=config('EMAIL_PORT', cast=int)
+EMAIL_HOST_USER= config('mail')
+EMAIL_HOST_PASSWORD= config('mail_pass')
 EMAIL_USE_TLS=True
 
 TWILIO_ACCOUNT_SID = config('sid')
@@ -174,3 +175,17 @@ TWILIO_AUTH_TOKEN = config('token')
 RAZOR_KEY_ID = config('razor_id')
 RAZOR_KEY_SECRET = config('razor_secret')
 
+# AWS credentials
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY') 
+
+
+# AWS S3 configurations
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_FILE_OVERWRITE = False
+
+ADMIN_MEDIA_PREFIX = '/static/admin/'

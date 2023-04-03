@@ -40,9 +40,7 @@ def place_order(request):
 
         # ensuring wallet balance if order from wallet
         if payment_method.method == 'Wallet':
-            print('We are on the way to place the order')
             usr  = CustomUser.objects.filter(email=request.user)
-            print(usr[0].wallet)
             wallet_balance = usr[0].wallet
             if wallet_balance < 1:
                 return JsonResponse({"message":"You don't have wallet balance","status":False})
@@ -108,9 +106,7 @@ def place_order(request):
 
         # ensuring wallet balance if order from wallet
         if payment_method.method == 'Wallet':
-            print('request enetered into wallet logic')
             usr  = CustomUser.objects.filter(email=request.user)
-            print(usr[0].wallet)
             wallet_balance = usr[0].wallet
             if wallet_balance < 1:
                 return JsonResponse({"message":"You don't have wallet balance","status":False})
@@ -132,7 +128,6 @@ def place_order(request):
 
         # reducing the money from wallet after order
         if payment_method.method == 'Wallet':
-            print("Wallet before Order",usr[0].wallet)
             wallet_balance = usr[0].wallet
             wallet_balance -= Decimal(str(total))
             usr.update(wallet=wallet_balance)
@@ -209,7 +204,7 @@ def cancel_order(request):
             client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
             payment_id = order.payment_id
             refund = client.payment.refund(payment_id,{'amount':item_amount})
-        else:
+        elif method.method == 'Wallet':
             usr  = CustomUser.objects.filter(email=request.user)
             wallet_balance = usr[0].wallet
             wallet_balance += Decimal(str(item_amount))

@@ -64,7 +64,7 @@ def admin_home(request):
     orders = Order.objects.filter(placed_at__gte=four_days_ago, placed_at__lte=today)
 
     # Getting the sales amount per day
-    sales_by_day = orders.annotate(day=TruncDay('placed_at')).values('day').annotate(total_sales=Sum('total')).order_by('-day')
+    sales_by_day = orders.annotate(day=TruncDay('placed_at')).values('day').annotate(total_sales=Sum('total')).order_by('day')
 
     # Getting the dates which sales happpened
     sales_dates = Order.objects.annotate(sale_date=Cast('placed_at', output_field=DateField())).values('sale_date').distinct()

@@ -245,7 +245,6 @@ Checkout
                 </div>
             </form>
 
-
             <div class="input-group mb-3" id="remove_coupon_div"
             {% if not coupon_cart.coupon %}
             style="display: none;"
@@ -256,6 +255,7 @@ Checkout
                     <button onclick="remove_coupon()" id="deletecoupon" class="btn btn-primary px-4"><i class="fa fa-times"></i></button>
                 </div>
             </div>
+            
 
             <button type="button" class="btn btn-outline-danger mb-3" data-toggle="modal" data-target="#modalDiscount">View Coupons</button>
 
@@ -277,14 +277,37 @@ Checkout
                                 </div>
 
                                 <div class="col-9">
-                                    {% for coupon in coupons %}
-                                    <p class="text-dark"> <b class="text-danger">{{coupon.name  }}</b> : ₹{{coupon.off_percent}} % on orders above ₹{{coupon.min_amount}} UPTO {{coupon.max_discount}} </p>
-                                    <hr>
-                                    {% endfor %}
+                                    {% if coupons %}
+                                      {% for coupon in coupons %}
+                                      <p class="text-dark"> <b title="tap to copy  coupon" class="coupon-copy" style="color: #D93636; cursor: pointer;">{{coupon.name  }}</b> : ₹{{coupon.off_percent}} % on orders above ₹{{coupon.min_amount}} UPTO {{coupon.max_discount}} </p>
+                                      <hr>
+                                      {% endfor %}
+                                    {% else %}
+                                    <p class="text-dark">Sorry no coupons left </p>
+                                    {% endif %}
                                 </div>
+                                <script>
+                                  var couponButtons = document.querySelectorAll(".coupon-copy");
+                                  couponButtons.forEach(function(button) {
+                                    button.addEventListener("click", function() {
+                                      var couponName = this.innerHTML;
+                                      navigator.clipboard.writeText(couponName).then(function() {
+                                        var old_color = button.style.color;
+                                        button.style.color = 'green';
+                                        setTimeout(function(){
+                                          button.style.color = old_color;
+                                        },2000)
+                                        console.log("Coupon name copied to clipboard: " + couponName);
+                                      }, function() {
+                                        console.error("Failed to copy coupon name to clipboard");
+                                      });
+                                    });
+                                  });
+                                </script>
+                                
                             </div>
                         </div>
-
+                        
                         <!--Footer-->
                         <div class="modal-footer flex-center">
                             <a href="#" class="btn btn-danger" data-dismiss="modal">Got it

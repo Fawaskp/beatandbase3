@@ -697,7 +697,7 @@ variant_id = $('#product_variant').val()
             return;
             }
 
-        if('{{v.quantity}}' < $('#quantity').val()){
+        if(parseInt('{{v.quantity}}') < $('#quantity').val()){
 
             Swal.fire(
                 'Sorry!',
