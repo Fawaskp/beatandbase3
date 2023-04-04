@@ -134,7 +134,7 @@ Coupons
                                 </div>
 
                                 <div class="form-outline mb-4">
-                                  <input required name='expire_date' type="date"  class="form-control form-control-lg form3Example3cgfdgfdg2" value="{{coupon.expiry_date|date:'Y-m-d'}}" />
+                                  <input required name='expire_date' type="date"  class="form-control form-control-lg" id="form3Example3cgfdgfdg2" value="{{coupon.expiry_date|date:'Y-m-d'}}" />
                                   <label class="form-label" for="form3Example3cg">Expire date</label>
                                 </div>
 
@@ -257,7 +257,7 @@ Coupons
     <script>
       let today = new Date().toISOString().substr(0, 10);
       document.querySelector("#form3Example3cgfdgfdg").setAttribute("min", today);
-      document.querySelector(".form3Example3cgfdgfdg2").setAttribute("min", today);
+      document.querySelector("#form3Example3cgfdgfdg2").setAttribute("min", today);
 
     </script>
 {% endblock body %}

@@ -213,7 +213,9 @@ def cancel_order(request):
 
         item.status = 'cancelled'
         quantity = item.quantity
-        item.quantity += quantity
+        variant = Product_Variant.objects.get(id = item.variant.id)
+        variant.quantity += quantity
+        variant.save()
         item.save()
 
         current_user = request.user
@@ -253,8 +255,12 @@ def refund_order(request):
 
         item.status = 'refunded'
         quantity = item.quantity
-        item.quantity += quantity
+        variant = Product_Variant.objects.get(id = item.variant.id)
+        variant.quantity += quantity
+        variant.save()
         item.save()
+
+
 
         current_user = request.user
         subject = "Refund succesfull!"

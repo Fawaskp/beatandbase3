@@ -453,7 +453,7 @@ Checkout
             }).then((result) => {
               /* Read more about isConfirmed, isDenied below */
               if (result.isConfirmed) {
-                window.location.href = `http://127.0.0.1:8989/orders/invoice/?id=${order_id}&addrs=${address_id}`
+                window.location.href = `{% url 'invoice' %}?id=${order_id}&addrs=${address_id}`
               }  
 
             })
